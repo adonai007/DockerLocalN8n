@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(openssl rand:*)"
+      "Bash(openssl rand:*)",
+      "Bash(rm:*)",
+      "Bash(docker-compose down:*)"
     ],
     "deny": []
   }

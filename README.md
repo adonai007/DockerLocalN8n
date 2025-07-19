@@ -26,7 +26,7 @@ También disponible en: [architecture-diagram.md](./architecture-diagram.md)
 - **n8n**: Automatización de workflows (Puerto 5678)
 - **Supabase**: Backend completo con Auth, Database, Storage
   - API Gateway (Kong): Puerto 8000
-  - PostgreSQL: Puerto 5432
+  - PostgreSQL: Puerto 5433
 - **Configuración para IAs locales**: Ollama, LM Studio, DeepSeek
 
 ## Configuración de Variables
@@ -86,7 +86,7 @@ Los datos persisten en volúmenes Docker:
 
 - **n8n UI**: http://localhost:5678
 - **Supabase API**: http://localhost:8000
-- **PostgreSQL**: localhost:5432
+- **PostgreSQL**: localhost:5433
 
 ## Configuración de n8n para Supabase
 
@@ -103,7 +103,7 @@ En n8n, puedes usar estos valores para conectar con Supabase:
 - Reiniciar Docker Desktop
 
 ### Puertos ocupados
-- Verificar que los puertos 5678, 8000, 5432 estén libres
+- Verificar que los puertos 5678, 8000, 5433 estén libres
 - Cambiar puertos en `docker-compose.yml` si es necesario
 
 ### Servicios no responden
