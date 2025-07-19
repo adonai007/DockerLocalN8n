@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: n8n_password
       POSTGRES_MULTIPLE_DATABASES: supabase_auth,supabase_storage,supabase_realtime
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init-multiple-databases.sh:/docker-entrypoint-initdb.d/init-multiple-databases.sh
