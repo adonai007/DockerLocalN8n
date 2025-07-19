@@ -2,6 +2,12 @@
 
 Configuración completa de n8n con Supabase corriendo localmente en Windows 10 para uso con agentes de IA.
 
+## 📊 Diagrama de Arquitectura
+
+Visualiza la arquitectura completa del sistema: [**Ver Diagrama Interactivo**](https://claude.ai/public/artifacts/06dde787-00be-4c4e-b478-10e9fd773be6)
+
+También disponible en: [architecture-diagram.md](./architecture-diagram.md)
+
 ## Prerrequisitos
 
 - Docker Desktop instalado y corriendo

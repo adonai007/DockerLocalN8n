@@ -1,5 +1,11 @@
 # Diagrama de Arquitectura - n8n + Supabase Local
 
+## 🌐 Visualización Interactiva
+
+**[Ver Diagrama Interactivo en Claude](https://claude.ai/public/artifacts/06dde787-00be-4c4e-b478-10e9fd773be6)**
+
+*Accede al enlace para una visualización interactiva con zoom, navegación y detalles expandibles de cada componente.*
+
 ```mermaid
 graph TB
     %% Windows Host Environment
