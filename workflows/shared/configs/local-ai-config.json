@@ -1,0 +1,68 @@
+{
+  "localAI": {
+    "ollama": {
+      "baseURL": "http://host.docker.internal:11434",
+      "models": {
+        "chat": "llama2",
+        "embedding": "nomic-embed-text",
+        "code": "codellama"
+      },
+      "defaultParams": {
+        "temperature": 0.7,
+        "max_tokens": 2048,
+        "stream": false
+      }
+    },
+    "lmStudio": {
+      "baseURL": "http://host.docker.internal:1234/v1",
+      "apiKey": "lm-studio",
+      "models": {
+        "chat": "local-model",
+        "completion": "local-model"
+      },
+      "defaultParams": {
+        "temperature": 0.7,
+        "max_tokens": 2048
+      }
+    },
+    "deepseek": {
+      "baseURL": "http://localhost:11434/v1",
+      "apiKey": "your-deepseek-api-key",
+      "models": {
+        "chat": "deepseek-chat",
+        "code": "deepseek-coder"
+      },
+      "defaultParams": {
+        "temperature": 0.3,
+        "max_tokens": 4096
+      }
+    }
+  },
+  "supabase": {
+    "url": "http://supabase-kong:8000",
+    "anonKey": "{{ $env.SUPABASE_ANON_KEY }}",
+    "serviceRoleKey": "{{ $env.SUPABASE_SERVICE_ROLE_KEY }}",
+    "tables": {
+      "conversations": "conversations",
+      "users": "users",
+      "agents": "agents",
+      "workflows": "workflows"
+    }
+  },
+  "common": {
+    "rateLimits": {
+      "requestsPerMinute": 60,
+      "requestsPerHour": 1000
+    },
+    "retry": {
+      "maxRetries": 3,
+      "backoffBase": 1000,
+      "backoffExponent": 2
+    },
+    "logging": {
+      "level": "info",
+      "enableConsole": true,
+      "enableFile": false
+    }
+  }
+}

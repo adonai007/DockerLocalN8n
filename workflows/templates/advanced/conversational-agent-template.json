@@ -1,0 +1,186 @@
+{
+  "name": "Conversational Agent with Memory",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "agent",
+        "responseMode": "responseNode"
+      },
+      "id": "webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [240, 360]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.sessionId }}",
+              "operation": "isEmpty"
+            }
+          ]
+        }
+      },
+      "id": "check-session",
+      "name": "Check Session",
+      "type": "n8n-nodes-base.if",
+      "position": [460, 360]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "sessionId",
+              "value": "={{ $json.sessionId || 'session_' + Date.now() }}"
+            }
+          ]
+        }
+      },
+      "id": "set-session",
+      "name": "Set Session ID",
+      "type": "n8n-nodes-base.set",
+      "position": [680, 240]
+    },
+    {
+      "parameters": {
+        "resource": "select",
+        "table": "conversations",
+        "where": {
+          "conditions": [
+            {
+              "column": "session_id",
+              "operator": "=",
+              "value": "={{ $json.sessionId }}"
+            }
+          ]
+        },
+        "sort": {
+          "field": "created_at",
+          "direction": "DESC"
+        },
+        "limit": 10
+      },
+      "id": "get-history",
+      "name": "Get Conversation History",
+      "type": "n8n-nodes-base.supabase",
+      "position": [900, 360]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build conversation context\nconst history = $input.all();\nconst currentMessage = $('Webhook').first().json.message;\nconst sessionId = $('Set Session ID').first().json.sessionId;\n\n// Format conversation history\nlet messages = [\n  {\n    role: 'system',\n    content: 'Eres un asistente inteligente con memoria de conversación. Mantén el contexto de la conversación anterior y responde de manera coherente.'\n  }\n];\n\n// Add previous messages\nif (history.length > 0) {\n  history.reverse().forEach(msg => {\n    messages.push({\n      role: 'user',\n      content: msg.json.user_message\n    });\n    messages.push({\n      role: 'assistant', \n      content: msg.json.assistant_message\n    });\n  });\n}\n\n// Add current message\nmessages.push({\n  role: 'user',\n  content: currentMessage\n});\n\nreturn {\n  messages,\n  sessionId,\n  currentMessage\n};"
+      },
+      "id": "build-context",
+      "name": "Build Context",
+      "type": "n8n-nodes-base.code",
+      "position": [1120, 360]
+    },
+    {
+      "parameters": {
+        "model": "gpt-3.5-turbo",
+        "messages": "={{ $json.messages }}",
+        "options": {
+          "temperature": 0.7,
+          "maxTokens": 500
+        }
+      },
+      "id": "ai-response",
+      "name": "AI Response",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [1340, 360]
+    },
+    {
+      "parameters": {
+        "resource": "insert",
+        "table": "conversations",
+        "columns": {
+          "session_id": "={{ $('Build Context').first().json.sessionId }}",
+          "user_message": "={{ $('Build Context').first().json.currentMessage }}",
+          "assistant_message": "={{ $json.choices[0].message.content }}",
+          "created_at": "={{ new Date().toISOString() }}",
+          "metadata": "={{ JSON.stringify({ model: 'gpt-3.5-turbo', tokens: $json.usage.total_tokens }) }}"
+        }
+      },
+      "id": "save-conversation",
+      "name": "Save Conversation",
+      "type": "n8n-nodes-base.supabase",
+      "position": [1560, 360]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": {
+          "response": "={{ $('AI Response').first().json.choices[0].message.content }}",
+          "sessionId": "={{ $('Build Context').first().json.sessionId }}",
+          "timestamp": "={{ new Date().toISOString() }}",
+          "tokensUsed": "={{ $('AI Response').first().json.usage?.total_tokens || 0 }}"
+        }
+      },
+      "id": "response",
+      "name": "Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [1780, 360]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "sessionId",
+              "value": "session_{{ Date.now() }}"
+            }
+          ]
+        }
+      },
+      "id": "new-session",
+      "name": "Create New Session",
+      "type": "n8n-nodes-base.set",
+      "position": [680, 480]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{"node": "Check Session", "type": "main", "index": 0}]]
+    },
+    "Check Session": {
+      "main": [
+        [{"node": "Set Session ID", "type": "main", "index": 0}],
+        [{"node": "Create New Session", "type": "main", "index": 0}]
+      ]
+    },
+    "Set Session ID": {
+      "main": [[{"node": "Get Conversation History", "type": "main", "index": 0}]]
+    },
+    "Create New Session": {
+      "main": [[{"node": "Get Conversation History", "type": "main", "index": 0}]]
+    },
+    "Get Conversation History": {
+      "main": [[{"node": "Build Context", "type": "main", "index": 0}]]
+    },
+    "Build Context": {
+      "main": [[{"node": "AI Response", "type": "main", "index": 0}]]
+    },
+    "AI Response": {
+      "main": [[{"node": "Save Conversation", "type": "main", "index": 0}]]
+    },
+    "Save Conversation": {
+      "main": [[{"node": "Response", "type": "main", "index": 0}]]
+    }
+  },
+  "settings": {
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true
+  },
+  "tags": ["template", "advanced", "conversational", "memory", "ai"],
+  "meta": {
+    "templateCreatedBy": "n8n-ai-agents",
+    "description": "Agente conversacional avanzado con memoria persistente en Supabase",
+    "requirements": [
+      "Tabla 'conversations' en Supabase",
+      "Credenciales OpenAI configuradas",
+      "Conexión Supabase activa"
+    ]
+  }
+}

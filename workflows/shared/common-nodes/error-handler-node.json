@@ -1,0 +1,29 @@
+{
+  "name": "Universal Error Handler",
+  "description": "Nodo reutilizable para manejo consistente de errores en workflows de agentes",
+  "node": {
+    "parameters": {
+      "jsCode": "// Universal Error Handler para Agentes de IA\n// Maneja errores de manera consistente y proporciona fallbacks\n\nconst error = $input.first();\nconst context = {\n  workflowId: $workflow.id,\n  executionId: $execution.id,\n  nodeId: $node.id,\n  timestamp: new Date().toISOString()\n};\n\n// Extraer información del error\nlet errorInfo = {\n  message: 'Error desconocido',\n  type: 'UnknownError',\n  code: 500,\n  details: {},\n  recoverable: false\n};\n\nif (error && error.json) {\n  const errorData = error.json;\n  \n  // OpenAI/LLM Errors\n  if (errorData.error && errorData.error.type) {\n    errorInfo = {\n      message: errorData.error.message || 'Error en el modelo de IA',\n      type: errorData.error.type,\n      code: errorData.error.code || 500,\n      details: errorData.error,\n      recoverable: ['rate_limit_exceeded', 'server_error'].includes(errorData.error.type)\n    };\n  }\n  \n  // HTTP Errors\n  else if (errorData.statusCode) {\n    errorInfo = {\n      message: errorData.message || `Error HTTP ${errorData.statusCode}`,\n      type: 'HTTPError',\n      code: errorData.statusCode,\n      details: errorData,\n      recoverable: [429, 500, 502, 503, 504].includes(errorData.statusCode)\n    };\n  }\n  \n  // Database Errors\n  else if (errorData.code && errorData.code.startsWith('P')) {\n    errorInfo = {\n      message: 'Error de base de datos',\n      type: 'DatabaseError', \n      code: errorData.code,\n      details: errorData,\n      recoverable: ['P2024', 'P2034'].includes(errorData.code) // Connection errors\n    };\n  }\n  \n  // Generic errors\n  else if (errorData.message) {\n    errorInfo = {\n      message: errorData.message,\n      type: errorData.name || 'GenericError',\n      code: 500,\n      details: errorData,\n      recoverable: false\n    };\n  }\n}\n\n// Generar respuesta de fallback\nconst fallbackResponses = {\n  'chatbot': 'Lo siento, estoy experimentando dificultades técnicas. Por favor, intenta de nuevo en unos momentos o contacta con soporte.',\n  'automation': 'El proceso automático ha fallado. Se ha registrado el error y se reintentará automáticamente.',\n  'data-processing': 'No se pudo procesar los datos en este momento. El error ha sido registrado para revisión.',\n  'integration': 'Error en la integración con el sistema externo. Verificando conectividad...'\n};\n\nconst agentType = $('Set').first()?.json?.agentType || 'chatbot';\nconst fallbackMessage = fallbackResponses[agentType] || fallbackResponses.chatbot;\n\n// Crear log estructurado\nconst logEntry = {\n  level: errorInfo.recoverable ? 'warn' : 'error',\n  source: 'error-handler',\n  message: `${errorInfo.type}: ${errorInfo.message}`,\n  details: {\n    ...context,\n    errorInfo,\n    agentType,\n    recoverable: errorInfo.recoverable\n  }\n};\n\n// Determinar siguiente acción\nlet nextAction = 'respond';\nif (errorInfo.recoverable) {\n  const retryCount = parseInt($node.context.get('retryCount') || '0');\n  if (retryCount < 3) {\n    $node.context.set('retryCount', (retryCount + 1).toString());\n    nextAction = 'retry';\n  }\n}\n\nreturn {\n  error: errorInfo,\n  context,\n  fallbackMessage,\n  logEntry,\n  nextAction,\n  shouldRetry: nextAction === 'retry',\n  retryCount: parseInt($node.context.get('retryCount') || '0')\n};"
+    },
+    "id": "error-handler",
+    "name": "Universal Error Handler",
+    "type": "n8n-nodes-base.code",
+    "typeVersion": 2
+  },
+  "usage": {
+    "placement": "En la rama de error de cualquier nodo que pueda fallar",
+    "connections": {
+      "input": "Conectar desde el output de error del nodo anterior",
+      "output": "Conectar a logger, respuesta de fallback, o retry logic"
+    }
+  },
+  "configuration": {
+    "required": [
+      "Configurar agentType en un nodo Set previo"
+    ],
+    "optional": [
+      "Personalizar fallbackResponses según el caso de uso",
+      "Ajustar lógica de retry según necesidades"
+    ]
+  }
+}

@@ -32,9 +32,6 @@ if not exist "supabase\kong.yml" (
     call :create_kong_config
 )
 
-echo Construyendo imágenes...
-docker-compose build
-
 echo.
 echo Iniciando servicios...
 docker-compose up -d
@@ -49,7 +46,7 @@ echo  SERVICIOS DISPONIBLES:
 echo ========================================
 echo  n8n:              http://localhost:5678
 echo  Supabase API:     http://localhost:8000
-echo  PostgreSQL:       localhost:5432
+echo  PostgreSQL:       localhost:5433
 echo ========================================
 echo.
 echo Para detener los servicios ejecuta: docker-compose down

@@ -1,0 +1,238 @@
+{
+  "name": "AGNT-22_Visualization_Agent_Local",
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-20250514",
+          "cachedResultName": "Claude 4 Sonnet"
+        },
+        "options": {
+          "maxTokensToSample": 10000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [200, 220],
+      "id": "anthropic-model",
+      "name": "Anthropic Chat Model",
+      "credentials": {
+        "anthropicApi": {
+          "id": "YOUR_ANTHROPIC_ID",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "filePath": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Doc_ID_or_URL', '/tmp/sample_research.txt', 'string') }}"
+      },
+      "type": "n8n-nodes-base.readFile",
+      "typeVersion": 1,
+      "position": [340, 300],
+      "id": "read-local-doc",
+      "name": "Leer Documento Local"
+    },
+    {
+      "parameters": {
+        "fileName": "={{ 'dashboard_' + $now.format('yyyy-MM-dd_HH-mm') + '.html' }}",
+        "filePath": "={{$execution('mode') === 'manual' ? '/tmp/' : '/app/data/'}}",
+        "content": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('html_content', `<!DOCTYPE html><html><head><title>Dashboard</title></head><body><h1>Dashboard generado</h1><p>Contenido del dashboard aquí</p></body></html>`, 'string') }}",
+        "overwrite": true
+      },
+      "type": "n8n-nodes-base.writeFile",
+      "typeVersion": 1,
+      "position": [480, 220],
+      "id": "save-html-dashboard",
+      "name": "Guardar Dashboard HTML"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Simular generación de email HTML con dashboard\nconst data = items[0].json;\nconst timestamp = new Date().toLocaleString('es-ES');\nconst dashboardTitle = data.title || 'Dashboard de Análisis';\nconst content = data.content || 'Contenido del análisis generado';\n\n// Generar HTML completo del dashboard\nconst htmlContent = `\n<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>${dashboardTitle}</title>\n    <style>\n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            line-height: 1.6;\n            margin: 0;\n            padding: 20px;\n            background-color: #f5f5f5;\n        }\n        .container {\n            max-width: 1200px;\n            margin: 0 auto;\n            background: white;\n            border-radius: 10px;\n            box-shadow: 0 0 20px rgba(0,0,0,0.1);\n            overflow: hidden;\n        }\n        .header {\n            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\n            color: white;\n            padding: 30px;\n            text-align: center;\n        }\n        .header h1 {\n            margin: 0;\n            font-size: 2.5em;\n        }\n        .timestamp {\n            opacity: 0.9;\n            margin-top: 10px;\n        }\n        .content {\n            padding: 30px;\n        }\n        .metric-card {\n            background: #f8f9fa;\n            border-left: 4px solid #667eea;\n            margin: 20px 0;\n            padding: 20px;\n            border-radius: 5px;\n        }\n        .source-badge {\n            display: inline-block;\n            background: #e3f2fd;\n            color: #1976d2;\n            padding: 4px 8px;\n            border-radius: 12px;\n            font-size: 0.8em;\n            margin: 2px;\n            text-decoration: none;\n        }\n        .tier-1 { background: #e8f5e8; color: #2e7d32; }\n        .tier-2 { background: #fff3e0; color: #f57c00; }\n        .tier-3 { background: #ffebee; color: #c62828; }\n        .footer {\n            background: #f8f9fa;\n            padding: 20px;\n            text-align: center;\n            border-top: 1px solid #dee2e6;\n        }\n        .local-notice {\n            background: #fff3cd;\n            border: 1px solid #ffeaa7;\n            padding: 15px;\n            border-radius: 5px;\n            margin: 20px 0;\n        }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <div class=\"header\">\n            <h1>${dashboardTitle}</h1>\n            <div class=\"timestamp\">📅 Generado: ${timestamp}</div>\n            <div class=\"timestamp\">🏠 Entorno: Local Testing</div>\n        </div>\n        \n        <div class=\"content\">\n            <div class=\"local-notice\">\n                <h3>🧪 Modo de Prueba Local</h3>\n                <p>Este dashboard fue generado en modo local para pruebas. Los datos y fuentes son simulados.</p>\n            </div>\n            \n            <div class=\"metric-card\">\n                <h3>📊 Resumen Ejecutivo</h3>\n                <p>${content}</p>\n            </div>\n            \n            <div class=\"metric-card\">\n                <h3>🎯 Métricas Clave (Simuladas)</h3>\n                <ul>\n                    <li><strong>Crecimiento:</strong> +15.2% YoY</li>\n                    <li><strong>Cuota de Mercado:</strong> 18.7%</li>\n                    <li><strong>ROI:</strong> 12.4%</li>\n                    <li><strong>Satisfacción Cliente:</strong> 8.7/10</li>\n                </ul>\n            </div>\n            \n            <div class=\"metric-card\">\n                <h3>📚 Fuentes Simuladas</h3>\n                <p>Referencias utilizadas en este análisis:</p>\n                <div>\n                    <span class=\"source-badge tier-1\">🟢 Reporte Anual 2024</span>\n                    <span class=\"source-badge tier-2\">🟡 McKinsey Analysis</span>\n                    <span class=\"source-badge tier-1\">🟢 SEC Filings</span>\n                    <span class=\"source-badge tier-2\">🟡 Bloomberg Markets</span>\n                    <span class=\"source-badge tier-3\">🔴 Press Release</span>\n                </div>\n            </div>\n            \n            <div class=\"metric-card\">\n                <h3>⚠️ Disclaimer para Pruebas</h3>\n                <p>Este dashboard contiene datos simulados únicamente para propósitos de testing local. No utilizar para decisiones reales de negocio.</p>\n            </div>\n        </div>\n        \n        <div class=\"footer\">\n            <p>📧 Dashboard Local • Generado por n8n Local Testing</p>\n            <p>🔄 Para envío real, configurar credenciales de email</p>\n        </div>\n    </div>\n</body>\n</html>\n`;\n\n// Simular datos de email\nconst emailData = {\n    html_content: htmlContent,\n    subject: `📊 ${dashboardTitle} - ${timestamp}`,\n    recipient: 'local-testing@example.com',\n    message: `Dashboard generado localmente: ${dashboardTitle}`,\n    file_path: `/tmp/dashboard_${new Date().toISOString().slice(0,10)}.html`\n};\n\nreturn [{ json: emailData }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [120, 380],
+      "id": "generate-dashboard",
+      "name": "Generar Dashboard HTML"
+    },
+    {
+      "parameters": {
+        "fileName": "={{ 'email_log_' + $now.format('yyyy-MM-dd_HH-mm') + '.txt' }}",
+        "filePath": "={{$execution('mode') === 'manual' ? '/tmp/' : '/app/data/'}}",
+        "content": "=SIMULACIÓN DE ENVÍO DE EMAIL\\n\\n📧 DETALLES DEL ENVÍO:\\nPara: {{ $json.recipient || 'destinatario-local@test.com' }}\\nAsunto: {{ $json.subject || 'Dashboard Test' }}\\nFecha: {{ $now.format('yyyy-MM-dd HH:mm:ss') }}\\n\\n📄 CONTENIDO:\\n{{ $json.message || 'Mensaje del dashboard' }}\\n\\n🔗 ARCHIVO GENERADO:\\n{{ $json.file_path || '/tmp/dashboard.html' }}\\n\\n⚠️ NOTA: Este es un log de simulación para pruebas locales.\\nEn producción, este contenido sería enviado por email.",
+        "overwrite": true
+      },
+      "type": "n8n-nodes-base.writeFile",
+      "typeVersion": 1,
+      "position": [600, 380],
+      "id": "simulate-email",
+      "name": "Simular Envío Email"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "query"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [-80, -200],
+      "id": "workflow-trigger",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [-120, 0],
+      "id": "chat-trigger",
+      "name": "When chat message received",
+      "webhookId": "visualization-local-test"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "Eres un agente de visualización que transforma reportes en dashboards HTML profesionales. Para pruebas locales, genera dashboards completos con diseño moderno, métricas simuladas y referencias ficticias pero realistas. Siempre confirma al usuario dónde se guardan los archivos y simula el proceso de envío de email."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [220, 0],
+      "id": "visualization-agent",
+      "name": "Visualization Agent Local"
+    },
+    {
+      "parameters": {
+        "url": "={{ 'file://' + $json.file_path }}",
+        "method": "GET",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [760, 220],
+      "id": "open-browser",
+      "name": "Abrir en Navegador (Opcional)"
+    },
+    {
+      "parameters": {
+        "content": "## 📊 Visualization Agent Local\n\n**Adaptaciones implementadas:**\n\n### ✅ Cambios principales:\n- **Google Docs → readFile**: Lee archivos locales\n- **Gmail → writeFile**: Guarda HTML + log de email\n- **Dashboard HTML**: Generación completa con CSS\n- **Simulación Email**: Log detallado del envío\n\n### 📁 Archivos generados:\n- `/tmp/dashboard_YYYY-MM-DD_HH-mm.html`\n- `/tmp/email_log_YYYY-MM-DD_HH-mm.txt`\n\n### 🎨 Características:\n- Dashboard responsive\n- Métricas simuladas realistas\n- Sistema de badges de fuentes\n- Modo local claramente identificado",
+        "height": 420,
+        "width": 400,
+        "color": 4
+      },
+      "id": "nota-viz-local",
+      "name": "Nota Visualization Local",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-220, -100]
+    },
+    {
+      "parameters": {
+        "content": "## ⚙️ CONFIGURACIÓN LOCAL\n\n**Para pruebas locales:**\n\n1. **Archivos de entrada:**\n   - Crear `/tmp/sample_research.txt`\n   - Contenido de ejemplo del research\n\n2. **Salidas:**\n   - Dashboard HTML navegable\n   - Log de email simulado\n\n3. **Opcional:**\n   - Servidor web local para preview\n   - Abrir archivos automáticamente\n\n**Rutas personalizables según SO**",
+        "height": 340,
+        "width": 400,
+        "color": 2
+      },
+      "id": "config-viz-local",
+      "name": "Configuración Viz Local",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [540, -80]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Visualization Agent Local",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer Documento Local": {
+      "ai_tool": [
+        [
+          {
+            "node": "Visualization Agent Local",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar Dashboard HTML": {
+      "ai_tool": [
+        [
+          {
+            "node": "Visualization Agent Local",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generar Dashboard HTML": {
+      "ai_tool": [
+        [
+          {
+            "node": "Visualization Agent Local",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simular Envío Email": {
+      "ai_tool": [
+        [
+          {
+            "node": "Visualization Agent Local",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Visualization Agent Local",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "local-viz-v1",
+  "meta": {
+    "instanceId": "local-test-viz-123"
+  },
+  "id": "VizAgentLocal123",
+  "tags": []
+}

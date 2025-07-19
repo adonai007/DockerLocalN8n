@@ -1,0 +1,234 @@
+{
+  "name": "AGNT-23_Manager_Agent_Local",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "¡Hola! 👋\\n¿Qué quieres que investigue? (Modo Local)",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [-100, -120],
+      "id": "chat-trigger-local",
+      "name": "When chat message received",
+      "webhookId": "manager-local-test"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "claude-sonnet-4-20250514",
+          "mode": "list",
+          "cachedResultName": "Claude Sonnet 4"
+        },
+        "options": {
+          "maxTokensToSample": 10000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [-40, 80],
+      "id": "anthropic-local",
+      "name": "Anthropic Chat Model",
+      "credentials": {
+        "anthropicApi": {
+          "id": "YOUR_ANTHROPIC_ID",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [200, 160],
+      "id": "memory-local",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "ResearchAgentLocal123",
+          "mode": "list",
+          "cachedResultName": "Research Agent Local"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "query": "={{ $fromAI('query', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "query"
+          ],
+          "schema": [
+            {
+              "id": "query",
+              "displayName": "query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [360, 220],
+      "id": "research-tool-local",
+      "name": "Research Agent Local"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "VizAgentLocal123",
+          "mode": "list",
+          "cachedResultName": "Visualization Agent Local"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "query": "={{ $fromAI('query', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "query"
+          ],
+          "schema": [
+            {
+              "id": "query",
+              "displayName": "query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [480, 80],
+      "id": "viz-tool-local",
+      "name": "Visualization Agent Local"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "# MANAGER AGENT LOCAL - MODO PRUEBAS v1.0\\n\\n## 🎯 ROLE & RESPONSIBILITY\\n\\nEres un Manager Agent optimizado para pruebas locales. Tu función es coordinar entre Research Agent y Visualization Agent usando archivos locales en lugar de servicios externos como Google Docs o APIs pagas.\\n\\n**MODO LOCAL ACTIVADO:**\\n- Todos los datos se guardan en archivos locales (/tmp/)\\n- Simulación de APIs externas con datos pre-definidos\\n- Sin dependencias de credenciales externas (excepto Anthropic opcional)\\n- Confirmación de rutas de archivos generados\\n\\n---\\n\\n## 🛡️ VALIDACIÓN DE ENTRADA (Adaptada para Local)\\n\\n### ❌ RECHAZAR si detectas:\\n- Consultas que requieren datos reales en tiempo real\\n- Solicitudes de envío de emails reales\\n- Acceso a servicios externos no configurados\\n\\n### ✅ CLASIFICACIÓN PARA MODO LOCAL:\\n\\n**RESEARCH_ONLY** - Solo Research Agent Local:\\nTriggers: \\\"investiga\\\", \\\"analiza\\\", \\\"compara\\\"\\nACCIONES LOCALES:\\n✅ Generar reporte con datos simulados\\n✅ Guardar en archivo de texto local\\n✅ Usar fuentes ficticias pero realistas\\n✅ Confirmar ruta del archivo generado\\n\\nEjemplos válidos para local:\\n\\\"Investiga Tesla vs BYD (datos simulados)\\\"\\n\\\"Analiza sector bancario boliviano (modo prueba)\\\"\\n\\n**VISUALIZATION_ONLY** - Solo Visualization Agent Local:\\nTriggers: \\\"dashboard\\\", \\\"visualiza\\\", \\\"gráfico\\\" + ruta de archivo\\nACCIONES LOCALES:\\n✅ Leer archivo local específico\\n✅ Generar dashboard HTML completo\\n✅ Simular envío de email (guardar log)\\n✅ Confirmar rutas de archivos de salida\\n\\nEjemplos válidos para local:\\n\\\"Crea dashboard de /tmp/research_report.txt\\\"\\n\\\"Visualiza datos del archivo local\\\"\\n\\n**SEQUENTIAL_FLOW** - Research → Visualization Local:\\nTriggers: Investigación + visualización\\nFLUJO LOCAL:\\n1️⃣ Research Agent: Investigación con datos simulados\\n2️⃣ Guardar reporte en archivo local\\n3️⃣ Visualization Agent: Leer archivo y crear dashboard\\n4️⃣ Simular envío de email\\n5️⃣ Confirmar todas las rutas generadas\\n\\nEjemplos válidos:\\n\\\"Investiga Tesla y crea dashboard visual (modo local)\\\"\\n\\\"Análisis completo de competencia con visualización\\\"\\n\\n---\\n\\n## 📁 GESTIÓN DE ARCHIVOS LOCALES\\n\\n### RUTAS ESTÁNDAR:\\n- **Reportes:** `/tmp/research_report_YYYY-MM-DD_HH-mm.txt`\\n- **Dashboards:** `/tmp/dashboard_YYYY-MM-DD_HH-mm.html`\\n- **Logs Email:** `/tmp/email_log_YYYY-MM-DD_HH-mm.txt`\\n- **Datos Muestra:** `/tmp/sample_research.txt`\\n\\n### CONFIRMACIÓN OBLIGATORIA:\\nAl completar cualquier workflow, SIEMPRE informar:\\n📁 **Archivos generados:**\\n- 📄 Reporte: [ruta_completa]\\n- 📊 Dashboard: [ruta_completa] \\n- 📧 Log Email: [ruta_completa]\\n\\n🔍 **Para verificar:** Abrir archivos en navegador o editor\\n⚠️ **Recordatorio:** Datos simulados para pruebas únicamente\\n\\n---\\n\\n## 🧪 TEMPLATES DE RESPUESTA LOCAL\\n\\n### ✅ EJECUCIÓN EXITOSA LOCAL:\\n🎯 **CONSULTA COMPLETADA EN MODO LOCAL**\\n📋 **Resultados generados:**\\n\\n🔬 Investigación con datos simulados\\n📊 Dashboard HTML navegable\\n📧 Simulación de email completada\\n\\n📁 **Archivos creados:**\\n- 📄 Reporte: `/tmp/research_report_[timestamp].txt`\\n- 📊 Dashboard: `/tmp/dashboard_[timestamp].html`\\n- 📧 Email Log: `/tmp/email_log_[timestamp].txt`\\n\\n🧪 **Modo Prueba Activo:**\\n- ✅ Datos simulados realistas\\n- ✅ Sin APIs externas requeridas\\n- ✅ Archivos localmente accesibles\\n- ⚠️ No enviar emails reales\\n\\n### ❌ ERROR LOCAL:\\n🚨 **ERROR EN MODO LOCAL**\\n❌ Problema detectado: [descripción]\\n\\n🔧 **Posibles soluciones:**\\n- Verificar permisos en `/tmp/`\\n- Revisar rutas de archivos\\n- Confirmar configuración de workflow\\n\\n📞 **Debug sugerido:**\\n- Ejecutar workflow individual\\n- Verificar logs de n8n\\n- Revisar datos de entrada\\n\\n---\\n\\n## 🎮 COMANDOS ESPECIALES PARA TESTING\\n\\n### COMANDOS DE PRUEBA:\\n- **\\\"test research\\\"** → Ejecutar research con datos Tesla vs BYD\\n- **\\\"test dashboard\\\"** → Crear dashboard de muestra\\n- **\\\"test full flow\\\"** → Ejecutar flujo completo de prueba\\n- **\\\"show files\\\"** → Listar archivos generados\\n- **\\\"cleanup\\\"** → Información para limpiar archivos de prueba\\n\\n### DATOS DE PRUEBA DISPONIBLES:\\n- 🚗 Tesla vs BYD (sector automotriz)\\n- 🏦 Bancos bolivianos (sector financiero)\\n- 💼 Análisis genérico (plantilla base)\\n\\n**Remember:** Cada operación debe generar archivos locales verificables y confirmar rutas específicas al usuario."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [120, -120],
+      "id": "manager-agent-local",
+      "name": "Manager Agent Local"
+    },
+    {
+      "parameters": {
+        "content": "## 🏠 Manager Agent Local\n\n**Sistema de coordinación para pruebas locales**\n\n### 🎯 Propósito:\n- Coordinar agentes sin dependencias externas\n- Usar archivos locales en lugar de Google Docs\n- Simular APIs como Perplexity y Gmail\n- Generar outputs verificables localmente\n\n### 🔄 Flujo de trabajo:\n1. **Recibe consulta** vía chat\n2. **Clasifica** según tipo (research/viz/ambos)\n3. **Delega** a agentes locales apropiados\n4. **Confirma** archivos generados\n\n### 📁 Archivos típicos:\n- `/tmp/research_report_*.txt`\n- `/tmp/dashboard_*.html` \n- `/tmp/email_log_*.txt`",
+        "height": 420,
+        "width": 380,
+        "color": 4
+      },
+      "id": "nota-manager-local",
+      "name": "Nota Manager Local",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-500, -200]
+    },
+    {
+      "parameters": {
+        "content": "## ⚙️ CONFIGURACIÓN LOCAL\n\n**IMPORTANTE para testing:**\n\n1. **IDs de Workflows:**\n   - Cambiar IDs por los workflows locales reales\n   - ResearchAgentLocal123 → ID real\n   - VizAgentLocal123 → ID real\n\n2. **Rutas de archivos:**\n   - Verificar permisos en `/tmp/`\n   - Personalizar según tu sistema operativo\n   - Windows: `C:\\temp\\`\n   - macOS/Linux: `/tmp/`\n\n3. **Credenciales opcionales:**\n   - Anthropic API (recomendado)\n   - Sin Anthropic: usar nodos de simulación",
+        "height": 360,
+        "width": 420,
+        "color": 2
+      },
+      "id": "config-manager-local",
+      "name": "Configuración Manager Local",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [580, -160]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Manager Agent Local",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Manager Agent Local",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Manager Agent Local",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Research Agent Local": {
+      "ai_tool": [
+        [
+          {
+            "node": "Manager Agent Local",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Visualization Agent Local": {
+      "ai_tool": [
+        [
+          {
+            "node": "Manager Agent Local",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "local-manager-v1",
+  "meta": {
+    "instanceId": "local-test-manager-123"
+  },
+  "id": "ManagerAgentLocal123",
+  "tags": []
+}

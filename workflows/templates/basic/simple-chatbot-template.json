@@ -1,0 +1,77 @@
+{
+  "name": "Simple Chatbot Template",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chat",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-node",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "simple-chatbot"
+    },
+    {
+      "parameters": {
+        "model": "gpt-3.5-turbo",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Eres un asistente útil y amigable. Responde de manera concisa y profesional."
+          },
+          {
+            "role": "user",
+            "content": "={{ $json.message }}"
+          }
+        ],
+        "options": {
+          "temperature": 0.7,
+          "maxTokens": 150
+        }
+      },
+      "id": "openai-node",
+      "name": "OpenAI Chat",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": {
+          "response": "={{ $json.choices[0].message.content }}",
+          "timestamp": "={{ new Date().toISOString() }}",
+          "status": "success"
+        }
+      },
+      "id": "response-node",
+      "name": "Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [680, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{"node": "OpenAI Chat", "type": "main", "index": 0}]]
+    },
+    "OpenAI Chat": {
+      "main": [[{"node": "Response", "type": "main", "index": 0}]]
+    }
+  },
+  "settings": {
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "timezone": "America/Mexico_City"
+  },
+  "staticData": {},
+  "tags": ["template", "chatbot", "basic", "ai"],
+  "meta": {
+    "templateCreatedBy": "n8n-ai-agents",
+    "description": "Plantilla básica para un chatbot simple con webhook y respuesta de IA"
+  }
+}
