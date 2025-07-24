@@ -12,7 +12,10 @@
       "Bash(true)",
       "Bash(docker.exe compose up -d)",
       "Bash(docker.exe compose down)",
-      "Bash(docker.exe compose up -d supabase-storage)"
+      "Bash(docker.exe compose up -d supabase-storage)",
+      "Bash(chmod:*)",
+      "Bash(docker.exe compose -f docker-compose-storage.yml up -d)",
+      "Bash(curl:*)"
     ],
     "deny": []
   }
