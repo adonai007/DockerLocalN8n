@@ -3,7 +3,16 @@
     "allow": [
       "Bash(openssl rand:*)",
       "Bash(rm:*)",
-      "Bash(docker-compose down:*)"
+      "Bash(docker-compose down:*)",
+      "Bash(docker logs:*)",
+      "Bash(docker.exe logs:*)",
+      "Bash(docker.exe ps:*)",
+      "Bash(docker.exe stop:*)",
+      "Bash(docker.exe volume rm:*)",
+      "Bash(true)",
+      "Bash(docker.exe compose up -d)",
+      "Bash(docker.exe compose down)",
+      "Bash(docker.exe compose up -d supabase-storage)"
     ],
     "deny": []
   }

@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  storage-postgres:
+    image: postgres:15
+    container_name: storage-postgres
+    environment:
+      POSTGRES_DB: storage
+      POSTGRES_USER: storage_user
+      POSTGRES_PASSWORD: storage_password
+    ports:
+      - "5434:5432"
+    volumes:
+      - storage_postgres_data:/var/lib/postgresql/data
+      - ./init-storage-only.sql:/docker-entrypoint-initdb.d/init-storage.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U storage_user -d storage"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - storage-network
+
+  supabase-storage-standalone:
+    image: supabase/storage-api:v0.46.4
+    container_name: supabase-storage-standalone
+    environment:
+      DATABASE_URL: postgres://storage_user:storage_password@storage-postgres:5432/storage
+      PGRST_JWT_SECRET: your-jwt-secret-key-here
+      ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0b3JhZ2UiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MTc2OTIwMCwiZXhwIjoxOTU3MzQ1MjAwfQ
+      SERVICE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0b3JhZ2UiLCJyb2xlIjoic2VydmljZV9yb2xlIiwiaWF0IjoxNjQxNzY5MjAwLCJleHAiOjE5NTczNDUyMDB9
+      FILE_SIZE_LIMIT: 52428800
+      STORAGE_BACKEND: file
+      FILE_STORAGE_BACKEND_PATH: /var/lib/storage
+      TENANT_ID: stub
+      REGION: stub
+      GLOBAL_S3_BUCKET: stub
+      ENABLE_IMAGE_TRANSFORMATION: "false"
+      IMGPROXY_URL: ""
+      # Configuración adicional para evitar problemas
+      POSTGREST_URL: ""
+      WEBHOOK_URL: ""
+    ports:
+      - "5001:5000"
+    volumes:
+      - storage_files:/var/lib/storage
+    depends_on:
+      storage-postgres:
+        condition: service_healthy
+    networks:
+      - storage-network
+
+volumes:
+  storage_postgres_data:
+  storage_files:
+
+networks:
+  storage-network:
+    driver: bridge
