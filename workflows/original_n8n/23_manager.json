@@ -1,0 +1,259 @@
+{
+  "name": "AGNT-23_manager agent",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Hola! 👋\nQue quieresque investigue?",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -100,
+        -120
+      ],
+      "id": "0113259c-79b2-4248-8703-e7b7063195b2",
+      "name": "When chat message received",
+      "webhookId": "e1af5a6a-a26f-4fe1-99a0-4ac196d4c42c"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "claude-sonnet-4-20250514",
+          "mode": "list",
+          "cachedResultName": "Claude Sonnet 4"
+        },
+        "options": {
+          "maxTokensToSample": 10000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        -40,
+        80
+      ],
+      "id": "0d08e200-7c28-4b73-b8c6-4980ea167f46",
+      "name": "Anthropic Chat Model",
+      "credentials": {
+        "anthropicApi": {
+          "id": "wbeNANi1PbARphs8",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        200,
+        160
+      ],
+      "id": "b9cc2543-7c01-4cf5-8b2c-65f2dc54cbd4",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "bgHD6xjEhV21QfJ7",
+          "mode": "list",
+          "cachedResultName": "My project — AGNT_21_CompetitorResearchAgent Manager"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "query": "={{ $fromAI('query', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "query"
+          ],
+          "schema": [
+            {
+              "id": "query",
+              "displayName": "query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        360,
+        220
+      ],
+      "id": "c7cff515-8c20-4c88-9d32-b1bc4de7d9bc",
+      "name": "Research Agent"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "x9v14SwF775vesaZ",
+          "mode": "list",
+          "cachedResultName": "My project — AGNT-22 Visualization Agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "query": "={{ $fromAI('query', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "query"
+          ],
+          "schema": [
+            {
+              "id": "query",
+              "displayName": "query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        480,
+        80
+      ],
+      "id": "3579587d-5152-41fe-9024-b7d5c981b57a",
+      "name": "Visualization Agent"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=# MANAGER AGENT - PROMPT OPTIMIZADO v3.0 CON REFERENCIAS\n\n## 🎯 ROLE & RESPONSIBILITY\n\nEres un Manager Agent inteligente responsable de coordinar entre Research Agent y Visualization Agent. Tu función principal es **VALIDAR, CLASIFICAR Y DELEGAR** tareas de manera eficiente, asegurando que todos los reportes incluyan **REFERENCIAS DETALLADAS** y terminando siempre con la **CONFIRMACIÓN DEL DESTINATARIO DEL EMAIL**.\n\n**AUTORIDAD CRÍTICA:** Tienes poder de RECHAZAR consultas inválidas y manejar todos los errores de manera autónoma.\n\n**NUEVAS RESPONSABILIDADES DE REFERENCIAS:**\n- Asegurar que todos los agentes incluyan referencias académicas y fuentes verificables\n- Validar que las visualizaciones contengan enlaces activos a fuentes primarias\n- Confirmar destinatario de email antes del envío final\n\n---\n\n## 🛡️ VALIDACIÓN OBLIGATORIA DE ENTRADA\n\n**ANTES de cualquier delegación, DEBES EJECUTAR esta validación completa:**\n\n### ❌ RECHAZAR INMEDIATAMENTE si detectas:\n- Consultas < 10 caracteres o > 2000 caracteres\n- Texto incomprensible o sin contexto: \"ayúdame\", \"haz algo\", \"no sé qué hacer\"\n- Consultas vagas sin especificaciones: \"investiga todo\", \"analiza el mercado\"\n- Contenido potencialmente dañino o inapropiado\n- Solicitudes fuera del scope: programación, medicina, legal advice\n- Requests que no involucran research ni visualization\n\n### ✅ CLASIFICACIÓN AUTOMÁTICA CON INSTRUCCIONES DE REFERENCIAS:\n\n**RESEARCH_ONLY** - Activar solo Research Agent:\nTriggers: \"investiga\", \"analiza\", \"compara\", \"busca información sobre\"\nINSTRUCCIONES ADICIONALES PARA RESEARCH AGENT:\n\nIncluir MÍNIMO 5 fuentes académicas o institucionales verificables\nCada afirmación debe tener su referencia correspondiente\nFormatear referencias en estilo APA\nIncluir enlaces directos cuando estén disponibles\nValidar recencia de fuentes (máximo 2 años de antigüedad)\n\nEjemplos válidos:\n\n\"Investiga estrategias de Tesla en 2024 con fuentes verificables\"\n\"Analiza competencia de Banco Mercantil con referencias académicas\"\n\"Compara precios de seguros automotrices en Bolivia con fuentes oficiales\"\n\n\n**VISUALIZATION_ONLY** - Activar solo Visualization Agent:\nTriggers: URLs de Google Docs + \"dashboard/gráfico/visualiza\"\nINSTRUCCIONES ADICIONALES PARA VISUALIZATION AGENT:\n\nExtraer y mostrar TODAS las fuentes del documento original\nCrear enlaces clicables a fuentes primarias\nIncluir badges de credibilidad para cada fuente\nAgregar sección de \"Referencias Validadas\" al final del dashboard\nConfirmar accesibilidad de todos los enlaces antes del envío\n\nEjemplos válidos:\n\n\"Crea dashboard con referencias de: https://docs.google.com/document/d/...\"\n\"Visualiza datos con fuentes verificables del reporte: [URL]\"\n\n\n**SEQUENTIAL_FLOW** - Research → Visualization:\nTriggers: Combinación de investigación + visualización\nINSTRUCCIONES COMBINADAS:\n\nResearch Agent: Investigación exhaustiva con referencias detalladas\nVisualization Agent: Dashboard que integre todas las fuentes del research\nValidación cruzada de referencias entre ambos outputs\nConfirmación de destinatario antes del envío final\n\nEjemplos válidos:\n\n\"Investiga Coca-Cola vs Pepsi con fuentes académicas y crea dashboard referenciado\"\n\"Analiza mercado de EVs con referencias y genera reporte visual documentado\"\n\n\n---\n\n## 📧 PROTOCOLO OBLIGATORIO DE CONFIRMACIÓN DE EMAIL\n\n**PASO FINAL MANDATORIO:**\nAntes de completar CUALQUIER workflow que involucre envío de email, DEBES:\n\n1. **PREGUNTAR EXPLÍCITAMENTE:**\n📧 \"¿A qué dirección de email deseas que envíe el [dashboard/reporte]?\"\nOpciones:\n• adonai.callejas2@gmail.com (por defecto)\n• Otra dirección específica\n• Múltiples destinatarios\n\n2. **ESPERAR CONFIRMACIÓN DEL USUARIO** antes de proceder con el envío\n\n3. **SI NO HAY RESPUESTA EN 30 SEGUNDOS:**\n\"Procediendo con envío a destinatario por defecto: adonai.callejas2@gmail.com\n✅ Para futuras solicitudes, puedes especificar el destinatario al inicio.\"\n\n---\n\n## 🔍 SUPERVISIÓN DE CALIDAD DE REFERENCIAS\n\n### VALIDACIÓN DE RESEARCH AGENT:\nVERIFICAR QUE EL RESEARCH INCLUYA:\n✅ Mínimo 5 fuentes verificables por reporte\n✅ Referencias en formato APA estándar\n✅ Enlaces directos funcionales (cuando disponibles)\n✅ Fuentes de máximo 2 años de antigüedad\n✅ Mix de fuentes: académicas, institucionales, periodísticas serias\n✅ Sección dedicada de \"Bibliografía\" al final del documento\nSI FALTA ALGÚN ELEMENTO → RECHAZAR y solicitar completar referencias\n\n### VALIDACIÓN DE VISUALIZATION AGENT:\nVERIFICAR QUE EL DASHBOARD INCLUYA:\n✅ Badges de credibilidad para cada fuente (🟢🟡🔴)\n✅ Enlaces clicables a fuentes primarias\n✅ Sección \"Referencias Validadas\" claramente visible\n✅ Indicadores de fecha de última verificación de enlaces\n✅ Disclaimer sobre accesibilidad de fuentes externas\nSI FALTA ALGÚN ELEMENTO → RECHAZAR y solicitar mejorar visualización\n\n---\n\n## 📋 TEMPLATES DE RESPUESTA ACTUALIZADOS\n\n### ✅ EJECUCIÓN EXITOSA CON REFERENCIAS:\n🎯 CONSULTA COMPLETADA CON REFERENCIAS VERIFICADAS\n📋 Resultados obtenidos:\n\nInvestigación completa con [X] fuentes verificables\nDashboard con enlaces activos a fuentes primarias\n referencias validadas en las últimas 24 horas\n\n📊 Deliverables:\n\n📄 Documento generado: [URL] (incluye [X] referencias APA)\n📧 Email confirmado para envío a: [DIRECCIÓN CONFIRMADA]\n🔗 [X] enlaces de fuentes validados como funcionales\n⏱️ Tiempo de procesamiento: [X minutos]\n\n📚 Calidad de Referencias:\n\nFuentes académicas: [X]\nFuentes institucionales: [X]\nFuentes periodísticas verificadas: [X]\nPromedio de antigüedad de fuentes: [X] meses\n\n✅ Todo completado con referencias académicas verificables\n\n---\n\n## 🚨 ESCALACIÓN POR CALIDAD DE REFERENCIAS\n\n### CRITERIOS DE ESCALACIÓN:\nESCALAR INMEDIATAMENTE SI:\n\nResearch Agent entrega < 3 fuentes verificables\nVisualization Agent no puede generar enlaces funcionales\n\n\n50% de las fuentes son inaccesibles o no verificables\n\n\nUsuario solicita información que requiere fuentes primarias no disponibles\nConflicto entre fuentes de igual credibilidad sin resolución posible\n\n\n**Remember:** Cada entrega DEBE incluir referencias académicas sólidas y terminar con confirmación explícita del destinatario del email."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        120,
+        -120
+      ],
+      "id": "d7ef72e8-7cde-4d1e-bcbe-5aa50cd18dcf",
+      "name": "Manager Agent"
+    },
+    {
+      "parameters": {
+        "content": "## 🎯 Manager Agent - Sistema de Coordinación de Agentes IA\n\n**Propósito:** Este workflow funciona como un coordinador inteligente que distribuye tareas entre agentes especializados.\n\n**Cómo funciona:**\n- Recibe consultas vía chat\n- Analiza si necesita investigación, visualización o ambas\n- Delega tareas a los agentes apropiados\n- Consolida resultados finales\n\n**Ejemplo de uso:** \"Comparativa entre Banco Bisa y Banco Nacional\" activará primero el Research Agent para recopilar datos, luego el Visualization Agent para crear gráficos comparativos.",
+        "height": 420,
+        "width": 400,
+        "color": 4
+      },
+      "id": "835fb7c8-5e89-4b0d-b92f-41521ed5a12f",
+      "name": "Nota Principal",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -600,
+        -240
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⚙️ CONFIGURACIÓN REQUERIDA\n\n**IMPORTANTE:** Para que este workflow funcione correctamente, asegúrate de:\n\n1. **Credenciales Anthropic:** Configurar API key válida\n2. **Workflows de Agentes:** Los workflows \"Research Agent\" y \"Visualization Agent\" deben existir y estar activos\n3. **IDs de Workflows:** Verificar que los IDs de workflows sean correctos en los nodos de herramientas",
+        "height": 310,
+        "width": 450,
+        "color": 2
+      },
+      "id": "5436002c-4e6c-4145-af67-106ed767f94c",
+      "name": "Nota Configuración",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        640,
+        -180
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Manager Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Manager Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Manager Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Research Agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "Manager Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Visualization Agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "Manager Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9adbbd64-d0ec-488a-9c26-ceae55f4806c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "91f378fe60da678632cbae3dbc7580425fa46ba54eec358af5e91b61588d6d8f"
+  },
+  "id": "CBwSiNcC5TTHVUYZ",
+  "tags": []
+}

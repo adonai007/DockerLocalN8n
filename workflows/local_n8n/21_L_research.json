@@ -1,0 +1,295 @@
+{
+  "name": "AGNT_21_ResearchAgent_Local",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🔍 Research Agent Local\n\n**Agente de investigación competitiva que funciona completamente local.**\n\n### Características principales:\n- **Modelo:** Ollama DeepSeek Coder (local)\n- **Investigación:** Perplexity API (externa)\n- **Output:** Archivos markdown locales\n- **Datos:** Completamente privados\n\n### Flujo del proceso:\n1. Recibe consulta de investigación\n2. Investiga con Perplexity\n3. Genera reporte markdown\n4. Guarda archivo local\n5. Retorna ruta del archivo",
+        "height": 400,
+        "width": 350,
+        "color": 4
+      },
+      "id": "note-main-workflow",
+      "name": "Nota Principal del Workflow",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [50, 50]
+    },
+    {
+      "parameters": {
+        "content": "## ⚙️ CONFIGURACIÓN REQUERIDA\n\n### 1. Ollama Setup:\n```bash\nollama pull deepseek-coder:1.3b\nollama serve\n```\n\n### 2. Perplexity API:\n- Configurar credenciales\n- Model: sonar-pro\n\n### 3. Directorio Local:\n```bash\nmkdir -p /project-data/reports/\nchmod 755 /project-data/\n```\n\n### 4. Permisos:\n- Usuario n8n con acceso a filesystem\n- Escritura en /project-data/",
+        "height": 350,
+        "width": 320,
+        "color": 2
+      },
+      "id": "note-configuration",
+      "name": "Nota de Configuración",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [450, 50]
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "query",
+              "type": "string",
+              "description": "Consulta de investigación competitiva"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [200, 300],
+      "id": "trigger-workflow-execution",
+      "name": "Ejecutar desde Manager"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [200, 450],
+      "id": "trigger-manual-test",
+      "name": "Test Manual"
+    },
+    {
+      "parameters": {
+        "baseURL": "http://localhost:11434",
+        "model": "deepseek-coder:1.3b",
+        "options": {
+          "temperature": 0.3,
+          "maxTokens": 4000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [420, 200],
+      "id": "ollama-chat-model",
+      "name": "Ollama DeepSeek Coder"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query || 'Realizar investigación competitiva' }}",
+        "options": {
+          "systemMessage": "# RESEARCH AGENT LOCAL - SISTEMA DE INVESTIGACIÓN COMPETITIVA v2.0\n\n## 🎯 FUNCIÓN PRINCIPAL\n\n**Responsabilidad:**  \nRealizar análisis competitivo exhaustivo con referencias académicas sobre empresas específicas mediante investigación de ofertas de productos, estrategias de mercado y posicionamiento empresarial. Cada reporte DEBE incluir MÍNIMO 5 FUENTES VERIFICADAS con citas académicas apropiadas.\n\n**ENTREGABLES OBLIGATORIOS:**  \n- Reportes de investigación competitiva con bibliografía detallada\n- Insights estratégicos respaldados por fuentes verificadas\n- Recomendaciones accionables con citas de respaldo\n- Archivo markdown local con sección \"Referencias\" completa\n- Citas en formato APA a lo largo del documento\n\n**Estándares de Calidad:**\n- MÍNIMO 5 fuentes verificadas por reporte\n- Fuentes máximo 2 años de antigüedad (salvo contexto histórico)\n- Mix de tipos de fuentes: papers académicos, reportes institucionales, fuentes verificadas\n- Todos los enlaces validados para accesibilidad\n- Información cruzada para precisión\n\n---\n\n## 📚 SISTEMA DE REFERENCIAS OBLIGATORIO\n\n### IDENTIFICACIÓN Y RECOLECCIÓN DE FUENTES\n\n**🟢 FUENTES TIER 1 (Objetivo: 40% de referencias)**\n- Journals académicos e investigación universitaria\n- Reportes gubernamentales y estadísticas oficiales\n- Reportes anuales y filings SEC\n- Publicaciones de bancos centrales y regulatorias\n- Reportes de organizaciones internacionales (UN, World Bank, etc.)\n\n**🟡 FUENTES TIER 2 (Objetivo: 40% de referencias)**\n- Reportes de asociaciones industriales\n- Estudios de firmas consultoras profesionales (McKinsey, Deloitte, etc.)\n- Medios financieros establecidos (Bloomberg, Reuters, Financial Times)\n- Análisis de publicaciones especializadas\n- Reportes de investigación de mercado verificados\n\n**🔴 FUENTES TIER 3 (Máximo: 20% de referencias)**\n- Press releases corporativos\n- Artículos de noticias recientes verificados\n- Posts de blogs industriales de expertos reconocidos\n- Redes sociales de cuentas corporativas oficiales\n\n### FORMATO DE CITAS REQUERIDO\n\n**CITAS EN TEXTO:**\nSegún el reporte financiero Q3 2024 de Tesla, los ingresos aumentaron 15% año a año (Tesla Inc., 2024). Este crecimiento se alinea con tendencias industriales identificadas por el análisis automotriz de McKinsey (McKinsey & Company, 2024).\n\n**SECCIÓN DE REFERENCIAS (Formato APA):**\nREFERENCIAS\nTesla Inc. (2024). Quarterly Report Form 10-Q for Q3 2024. Securities and Exchange Commission. https://www.sec.gov/Archives/edgar/data/1318605/000095017024001234/tsla-20240930.htm\nMcKinsey & Company. (2024). The future of automotive: How competitive dynamics are reshaping the industry. McKinsey Global Institute. https://www.mckinsey.com/industries/automotive-and-assembly/our-insights/the-future-of-automotive\n\n---\n\n## 📊 HERRAMIENTAS DISPONIBLES\n\n**Perplexity Research (Externa):**  \n- Usar para: Inteligencia competitiva en tiempo real y datos de mercado\n- Cuándo usar: Herramienta primaria para toda recolección de información externa\n- Limitaciones: Límites de rate API; verificar actualidad de información\n\n**Sistema de Archivos Local (Lectura/Escritura):**  \n- Usar para: Crear, leer y actualizar reportes de investigación localmente\n- Cuándo usar: Paso final para documentar hallazgos + leer contexto existente\n- Formato de archivo: Markdown estructurado con templates consistentes\n- Ubicación: /project-data/reports/ con naming estandarizado\n\n---\n\n## 🔍 METODOLOGÍA DE INVESTIGACIÓN MEJORADA\n\n### REQUERIMIENTOS DE PROFUNDIDAD\n\n**1. OVERVIEW DE EMPRESA (con fuentes)**\nINVESTIGAR Y DOCUMENTAR:\n- Fecha de fundación e historia [Fuente académica requerida]\n- Capitalización de mercado/tamaño actual [Base de datos financiera requerida]\n- Equipo directivo y cambios recientes [Filings de empresa + noticias verificadas]\n- Presencia geográfica y operaciones [Reportes anuales requeridos]\n- Modelo de negocio principal y flujos de ingresos [Filings SEC preferidos]\n\n**2. POSICIONAMIENTO COMPETITIVO (basado en evidencia)**\nINVESTIGAR Y DOCUMENTAR:\n- Datos de participación de mercado con análisis comparativo [Reportes industriales requeridos]\n- Estrategias de precios vs competidores [Estudios de investigación de mercado]\n- Factores de diferenciación de productos [Publicaciones técnicas + reviews]\n- Ratings de satisfacción del cliente [Organizaciones de investigación del consumidor]\n- Estudios de percepción de marca [Firmas de investigación de marketing]\n\n**3. PERFORMANCE FINANCIERO (impulsado por datos)**\nINVESTIGAR Y DOCUMENTAR:\n- Tendencias de crecimiento de ingresos (análisis 5 años) [Reportes anuales obligatorios]\n- Métricas de rentabilidad vs promedios industriales [Bases de datos financieras]\n- Inversión en I+D como porcentaje de ingresos [Filings SEC]\n- Patrones de gastos de capital [Reportes trimestrales]\n- Ratios deuda-equity y salud financiera [Agencias de calificación crediticia]\n\n---\n\n## 📄 ESTRUCTURA DE ARCHIVO MARKDOWN\n\n### SECCIONES OBLIGATORIAS\n\n**1. RESUMEN EJECUTIVO (150 palabras máx)**\nOverview breve con 2-3 hallazgos clave, cada uno con citas inline.\n\n**2. METODOLOGÍA Y OVERVIEW DE FUENTES**\nMETODOLOGÍA DE INVESTIGACIÓN\nEste análisis competitivo se basa en:\n- X fuentes académicas y de investigación\n- X reportes financieros oficiales (SEC, reportes anuales)\n- X estudios de mercado de firmas reconocidas\n- X publicaciones especializadas verificadas\n\n**3. ANÁLISIS COMPETITIVO DETALLADO (400-500 palabras)**\nCada hallazgo mayor DEBE incluir:\n- Cita inline\n- Puntos de datos específicos\n- Contexto comparativo\n- Indicador de credibilidad de fuente\n\n**4. IMPLICACIONES ESTRATÉGICAS (100-150 palabras)**\nRecomendaciones basadas en evidencia con citas de apoyo.\n\n**5. SECCIÓN DE REFERENCIAS COMPLETA**\nREFERENCIAS COMPLETAS\nFuentes Primarias (Tier 1)\n[Empresa] Inc. (2024). Annual Report 2024. Securities and Exchange Commission. [URL]\n\nFuentes Secundarias Verificadas (Tier 2)\nMcKinsey & Company. (2024). Industry Analysis: [Sector] Competitive Landscape. [URL]\n\nFuentes de Apoyo (Tier 3)\nReuters. (2024). [Empresa] reports Q3 earnings beat expectations. [URL]\n\n---\n\n## 📋 ESPECIFICACIONES DE OUTPUT\n\n**Método de Entrega:**  \n- **REQUERIDO**: Proporcionar ruta de archivo local directa al usuario en respuesta final\n- Incluir resumen breve de hallazgos clave junto con la ubicación del archivo\n- Archivo guardado con naming estructurado: research_[empresa]_[fecha].md\n- Metadata opcional logged para tracking\n\n**Convenciones de Naming:**\n- Investigación básica: research_[empresa]_[YYYY-MM-DD].md\n- Competitiva: research_[empresa]_vs_[competidor]_[YYYY-MM-DD].md\n- Análisis de mercado: research_market_[sector]_[YYYY-MM-DD].md\n\n**Template de Respuesta Final:**\n✅ **Investigación completada exitosamente**\n\n📁 **Archivo guardado en:** `/project-data/reports/research_[empresa]_[fecha].md`\n\n📊 **Resumen de hallazgos:**\n- [Hallazgo clave 1]\n- [Hallazgo clave 2]\n- [Hallazgo clave 3]\n\n📚 **Fuentes utilizadas:** [X] fuentes verificadas\n⏱️ **Tiempo de análisis:** [X] minutos\n\n---\n\n## ⚡ WORKFLOW CON VALIDACIÓN DE REFERENCIAS\n\n### PASO 1: RECOLECCIÓN COMPRENSIVA DE FUENTES (15 min)\nEJECUTAR QUERIES:\n✅ Query 1-3: Investigación amplia de empresa\n✅ Query 4-6: Investigación especializada profunda\n✅ Query 7-9: Verificación y cross-referencing\n\n### PASO 2: SELECCIÓN Y VALIDACIÓN DE REFERENCIAS (10 min)\nSELECCIONAR FUENTES FINALES:\n✅ Elegir mejores 5-7 fuentes asegurando mix:\n- 2-3 fuentes Tier 1 (académicas/oficiales)\n- 2-3 fuentes Tier 2 (profesionales/industriales)\n- 1-2 fuentes Tier 3 (noticias/corporativas)\n\n### PASO 3: ESCRITURA DE ANÁLISIS CON CITAS (20 min)\nREQUERIMIENTOS DE ESCRITURA:\n✅ Cada claim mayor tiene cita inline\n✅ Formato APA aplicado consistentemente\n✅ Integración de fuentes se siente natural\n✅ Balance de parafraseo y citas directas\n✅ Cross-referencias entre fuentes cuando aplica\n\n### PASO 4: VALIDACIÓN FINAL Y CREACIÓN DE ARCHIVO (10 min)\nCHECKLIST DE CALIDAD:\n✅ Todos los URLs probados y funcionales\n✅ Sección de referencias completa y formateada\n✅ Mínimo 5 fuentes verificadas incluidas\n✅ No hay claims sin soporte en análisis\n✅ Formato profesional aplicado\n\n**Recordar:** Cada análisis debe demostrar estándares de investigación de nivel académico con fuentes verificables y atribución apropiada. Ningún claim debe estar sin soporte de evidencia creíble."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [640, 300],
+      "id": "research-agent-local",
+      "name": "Research Agent Local"
+    },
+    {
+      "parameters": {
+        "model": "sonar-pro",
+        "messages": {
+          "message": [
+            {
+              "content": "={{ $json.query || 'Research competitive analysis' }}"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.2,
+          "maxTokens": 4000
+        }
+      },
+      "type": "n8n-nodes-base.perplexityTool",
+      "typeVersion": 1,
+      "position": [480, 500],
+      "id": "perplexity-research",
+      "name": "Perplexity Research",
+      "credentials": {
+        "perplexityApi": {
+          "id": "perplexity_credentials",
+          "name": "Perplexity API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filesystem Read Tool - Lee archivos de investigación existentes\nconst fs = require('fs');\nconst path = require('path');\n\n// Obtener parámetros del agent\nconst filePath = $fromAI('file_path', '/project-data/reports/', 'string');\n\ntry {\n  // Verificar si el archivo existe\n  if (!fs.existsSync(filePath)) {\n    return {\n      error: true,\n      message: `Archivo no encontrado: ${filePath}`,\n      suggestion: 'Verificar ruta o crear nuevo reporte'\n    };\n  }\n  \n  // Leer contenido del archivo\n  const content = fs.readFileSync(filePath, 'utf8');\n  \n  // Obtener metadata del archivo\n  const stats = fs.statSync(filePath);\n  \n  return {\n    success: true,\n    content: content,\n    metadata: {\n      size: stats.size,\n      modified: stats.mtime,\n      created: stats.birthtime,\n      path: filePath\n    },\n    message: `Archivo leído exitosamente: ${path.basename(filePath)}`\n  };\n  \n} catch (error) {\n  return {\n    error: true,\n    message: `Error al leer archivo: ${error.message}`,\n    errorCode: error.code\n  };\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [860, 180],
+      "id": "filesystem-read-tool",
+      "name": "Filesystem Read Tool"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filesystem Write Tool - Crea reportes de investigación en markdown\nconst fs = require('fs');\nconst path = require('path');\n\n// Obtener parámetros del agent\nconst filename = $fromAI('filename', '', 'string');\nconst content = $fromAI('content', '', 'string');\nconst overwrite = $fromAI('overwrite', false, 'boolean');\n\n// Directorio base para reportes\nconst baseDir = '/project-data/reports';\n\ntry {\n  // Crear directorio si no existe\n  if (!fs.existsSync(baseDir)) {\n    fs.mkdirSync(baseDir, { recursive: true });\n  }\n  \n  // Generar nombre de archivo si no se proporciona\n  let finalFilename = filename;\n  if (!finalFilename) {\n    const timestamp = new Date().toISOString().split('T')[0];\n    finalFilename = `research_report_${timestamp}.md`;\n  }\n  \n  // Asegurar extensión .md\n  if (!finalFilename.endsWith('.md')) {\n    finalFilename += '.md';\n  }\n  \n  const fullPath = path.join(baseDir, finalFilename);\n  \n  // Verificar si el archivo existe y manejo de conflictos\n  if (fs.existsSync(fullPath) && !overwrite) {\n    // Crear versión numerada\n    const baseName = path.basename(finalFilename, '.md');\n    let counter = 1;\n    let newPath;\n    \n    do {\n      const versionedName = `${baseName}_v${counter}.md`;\n      newPath = path.join(baseDir, versionedName);\n      counter++;\n    } while (fs.existsSync(newPath));\n    \n    finalFilename = path.basename(newPath);\n    fullPath = newPath;\n  }\n  \n  // Agregar header estándar si no existe\n  let finalContent = content;\n  if (!content.includes('# Research Report:')) {\n    const timestamp = new Date().toISOString();\n    const header = `# Research Report\\n**Fecha:** ${timestamp.split('T')[0]}\\n**Investigador:** Research Agent Local\\n\\n`;\n    finalContent = header + content;\n  }\n  \n  // Escribir archivo\n  fs.writeFileSync(fullPath, finalContent, 'utf8');\n  \n  // Obtener stats del archivo creado\n  const stats = fs.statSync(fullPath);\n  \n  return {\n    success: true,\n    filePath: fullPath,\n    filename: finalFilename,\n    size: stats.size,\n    created: stats.birthtime,\n    message: `Reporte creado exitosamente: ${finalFilename}`,\n    directory: baseDir\n  };\n  \n} catch (error) {\n  // Fallback a directorio temporal\n  const tempDir = '/tmp/research-reports';\n  \n  try {\n    if (!fs.existsSync(tempDir)) {\n      fs.mkdirSync(tempDir, { recursive: true });\n    }\n    \n    const tempPath = path.join(tempDir, finalFilename || 'research_report_temp.md');\n    fs.writeFileSync(tempPath, content, 'utf8');\n    \n    return {\n      success: true,\n      filePath: tempPath,\n      filename: path.basename(tempPath),\n      message: `Reporte creado en directorio temporal: ${tempPath}`,\n      warning: `Error en directorio principal: ${error.message}`,\n      directory: tempDir\n    };\n    \n  } catch (tempError) {\n    return {\n      error: true,\n      message: `Error al crear archivo: ${error.message}`,\n      tempError: tempError.message,\n      suggestion: 'Verificar permisos de filesystem y configuración de directorios'\n    };\n  }\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [860, 340],
+      "id": "filesystem-write-tool",
+      "name": "Filesystem Write Tool"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filesystem List Tool - Lista archivos de investigación disponibles\nconst fs = require('fs');\nconst path = require('path');\n\n// Obtener parámetros del agent\nconst directory = $fromAI('directory', '/project-data/reports/', 'string');\nconst filter = $fromAI('filter', '', 'string');\n\ntry {\n  // Verificar si el directorio existe\n  if (!fs.existsSync(directory)) {\n    return {\n      success: true,\n      files: [],\n      message: `Directorio no existe: ${directory}`,\n      suggestion: 'Crear primer reporte para inicializar directorio'\n    };\n  }\n  \n  // Leer archivos del directorio\n  const files = fs.readdirSync(directory);\n  \n  // Filtrar solo archivos .md\n  const markdownFiles = files.filter(file => file.endsWith('.md'));\n  \n  // Aplicar filtro si se proporciona\n  let filteredFiles = markdownFiles;\n  if (filter) {\n    const filterLower = filter.toLowerCase();\n    filteredFiles = markdownFiles.filter(file => \n      file.toLowerCase().includes(filterLower)\n    );\n  }\n  \n  // Obtener metadata de cada archivo\n  const fileDetails = filteredFiles.map(file => {\n    const filePath = path.join(directory, file);\n    const stats = fs.statSync(filePath);\n    \n    return {\n      filename: file,\n      path: filePath,\n      size: stats.size,\n      sizeFormatted: `${(stats.size / 1024).toFixed(2)} KB`,\n      modified: stats.mtime,\n      created: stats.birthtime,\n      modifiedFormatted: stats.mtime.toISOString().split('T')[0]\n    };\n  });\n  \n  // Ordenar por fecha de modificación (más reciente primero)\n  fileDetails.sort((a, b) => new Date(b.modified) - new Date(a.modified));\n  \n  return {\n    success: true,\n    directory: directory,\n    totalFiles: markdownFiles.length,\n    filteredFiles: filteredFiles.length,\n    filter: filter || 'ninguno',\n    files: fileDetails,\n    message: `Encontrados ${filteredFiles.length} archivos de investigación`\n  };\n  \n} catch (error) {\n  return {\n    error: true,\n    message: `Error al listar archivos: ${error.message}`,\n    directory: directory,\n    errorCode: error.code\n  };\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [860, 500],
+      "id": "filesystem-list-tool",
+      "name": "Filesystem List Tool"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filesystem Append Tool - Actualiza reportes existentes\nconst fs = require('fs');\nconst path = require('path');\n\n// Obtener parámetros del agent\nconst filePath = $fromAI('file_path', '', 'string');\nconst content = $fromAI('content', '', 'string');\nconst section = $fromAI('section', '', 'string');\n\ntry {\n  // Verificar si el archivo existe\n  if (!fs.existsSync(filePath)) {\n    return {\n      error: true,\n      message: `Archivo no encontrado: ${filePath}`,\n      suggestion: 'Crear nuevo reporte con Filesystem Write Tool'\n    };\n  }\n  \n  // Leer contenido actual\n  const currentContent = fs.readFileSync(filePath, 'utf8');\n  \n  // Preparar contenido a añadir\n  const timestamp = new Date().toISOString();\n  let newContent;\n  \n  if (section) {\n    // Añadir a sección específica\n    newContent = `\\n\\n## UPDATE - ${section}\\n**Actualizado:** ${timestamp.split('T')[0]}\\n\\n${content}\\n`;\n  } else {\n    // Añadir al final\n    newContent = `\\n\\n---\\n**Actualización:** ${timestamp.split('T')[0]}\\n\\n${content}\\n`;\n  }\n  \n  // Combinar contenido\n  const updatedContent = currentContent + newContent;\n  \n  // Crear backup del archivo original\n  const backupPath = filePath + '.backup.' + Date.now();\n  fs.copyFileSync(filePath, backupPath);\n  \n  // Escribir contenido actualizado\n  fs.writeFileSync(filePath, updatedContent, 'utf8');\n  \n  // Obtener stats del archivo actualizado\n  const stats = fs.statSync(filePath);\n  \n  return {\n    success: true,\n    filePath: filePath,\n    backupPath: backupPath,\n    newSize: stats.size,\n    modified: stats.mtime,\n    section: section || 'final del documento',\n    message: `Archivo actualizado exitosamente: ${path.basename(filePath)}`,\n    addedContent: content.length + ' caracteres añadidos'\n  };\n  \n} catch (error) {\n  return {\n    error: true,\n    message: `Error al actualizar archivo: ${error.message}`,\n    filePath: filePath,\n    errorCode: error.code\n  };\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [860, 660],
+      "id": "filesystem-append-tool",
+      "name": "Filesystem Append Tool"
+    },
+    {
+      "parameters": {
+        "content": "## 🔄 FLUJO DE PROCESAMIENTO\n\n### Entrada de Consulta:\n- Desde Manager Workflow\n- Test manual directo\n\n### Procesamiento:\n1. **Ollama DeepSeek** analiza consulta\n2. **Perplexity** realiza investigación externa\n3. **Research Agent** procesa y estructura\n4. **Filesystem Tools** manejan archivos\n\n### Salida:\n- Ruta de archivo local\n- Resumen de hallazgos\n- Metadata de proceso",
+        "height": 280,
+        "width": 300,
+        "color": 7
+      },
+      "id": "note-processing-flow",
+      "name": "Nota Flujo de Proceso",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1100, 50]
+    },
+    {
+      "parameters": {
+        "content": "## 🛠️ FILESYSTEM TOOLS\n\n### Read Tool:\n- Lee reportes existentes\n- Proporciona contexto\n- Metadata de archivos\n\n### Write Tool:\n- Crea nuevos reportes\n- Naming automático\n- Manejo de conflictos\n\n### List Tool:\n- Lista archivos disponibles\n- Filtros por empresa/fecha\n- Metadata completa\n\n### Append Tool:\n- Actualiza reportes\n- Backups automáticos\n- Control de versiones",
+        "height": 320,
+        "width": 280,
+        "color": 4
+      },
+      "id": "note-filesystem-tools",
+      "name": "Nota Filesystem Tools",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1200, 350]
+    },
+    {
+      "parameters": {
+        "content": "## ⚠️ TROUBLESHOOTING\n\n### Errores Comunes:\n\n**Ollama no disponible:**\n- Verificar: `ollama serve`\n- Modelo: `ollama pull deepseek-coder:1.3b`\n\n**Permisos filesystem:**\n```bash\nsudo chown -R n8n:n8n /project-data/\nsudo chmod -R 755 /project-data/\n```\n\n**Perplexity API:**\n- Verificar credenciales\n- Límites de rate\n- Conectividad internet\n\n**Directorio fallback:**\n- `/tmp/research-reports/`\n- Automático en caso de error",
+        "height": 350,
+        "width": 320,
+        "color": 5
+      },
+      "id": "note-troubleshooting",
+      "name": "Nota Troubleshooting",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1520, 200]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Ollama DeepSeek Coder": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Research Agent Local",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ejecutar desde Manager": {
+      "main": [
+        [
+          {
+            "node": "Research Agent Local",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Test Manual": {
+      "main": [
+        [
+          {
+            "node": "Research Agent Local",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Perplexity Research": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Agent Local",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filesystem Read Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Agent Local",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filesystem Write Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Agent Local",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filesystem List Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Agent Local",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filesystem Append Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Agent Local",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "research-agent-local-v1",
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": "12345678-abcd-1234-5678-123456789abc"
+  },
+  "id": "ResearchAgentLocal2024"
+}

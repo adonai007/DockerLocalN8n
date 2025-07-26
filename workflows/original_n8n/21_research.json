@@ -1,0 +1,271 @@
+{
+  "name": "AGNT_21_CompetitorResearchAgent Manager",
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-3-7-sonnet-20250219",
+          "cachedResultName": "Claude 3.7 Sonnet"
+        },
+        "options": {
+          "maxTokensToSample": 16000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        -60,
+        240
+      ],
+      "id": "b7475c22-807c-4ad9-859a-f56a5c2df790",
+      "name": "Anthropic Chat Model",
+      "credentials": {
+        "anthropicApi": {
+          "id": "wbeNANi1PbARphs8",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Doc_ID_or_URL', ``, 'string') }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('actionFields0_Text', ``, 'string') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        640,
+        80
+      ],
+      "id": "8141e66d-9a6d-45d9-b972-e5de83c576d5",
+      "name": "Update Document",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "376FUCrucQxcEUMm",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "https://docs.google.com/document/d/1NKGUaBw6s69aXRLdkBjXKQP_MTe2S0htX9vfF2IbHe8/edit?tab=t.0"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        460,
+        360
+      ],
+      "id": "3cd43c47-2a39-4d86-a1e8-58801c9191bf",
+      "name": "Get Document",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "376FUCrucQxcEUMm",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "folderId": "1RbFQ1UjoPdOvx40ET4bG9eHSwWnnz9YM",
+        "title": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Title', ``, 'string') }}"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        700,
+        320
+      ],
+      "id": "993f6d32-95b9-41b4-9767-86230ebdf111",
+      "name": "Create New Document",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "376FUCrucQxcEUMm",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=# COMPETITOR RESEARCH AGENT - PROMPT OPTIMIZADO v3.0 CON REFERENCIAS ACADÉMICAS\n\n## 🎯 ROLE & RESPONSIBILITY\n\n**Primary Function:**  \nConduct comprehensive competitive analysis with **ACADEMIC-LEVEL REFERENCING** on specified brands/companies by researching product offerings, market strategies, and business positioning. Every report MUST include MINIMUM 5 VERIFIED SOURCES with proper academic citations and functional links.\n\n**MANDATORY DELIVERABLES:**  \n- In-depth competitive research reports with detailed bibliography\n- Strategic insights backed by verified sources and data\n- Actionable recommendations with supporting evidence citations\n- Google Doc with comprehensive \"References\" section\n- APA-format citations throughout the document\n\n**Research Quality Standards:**\n- MINIMUM 5 verified sources per report\n- Maximum 2 years old sources (unless historical context required)\n- Mix of source types: academic papers, institutional reports, verified news sources\n- All links validated for accessibility\n- Cross-referenced information for accuracy\n\n---\n\n## 📚 MANDATORY REFERENCING SYSTEM\n\n### STEP 1: SOURCE IDENTIFICATION & COLLECTION\n**BEFORE writing any analysis, collect sources in these categories:**\n\n**🟢 TIER 1 SOURCES (Target: 40% of references)**\n- Academic journals and university research\n- Government reports and official statistics\n- Annual reports and SEC filings\n- Central bank and regulatory publications\n- International organization reports (UN, World Bank, etc.)\n\n**🟡 TIER 2 SOURCES (Target: 40% of references)**\n- Industry association reports\n- Professional consulting firm studies (McKinsey, Deloitte, etc.)\n- Established financial media (Bloomberg, Reuters, Financial Times)\n- Trade publication analysis\n- Verified market research reports\n\n**🔴 TIER 3 SOURCES (Maximum: 20% of references)**\n- Corporate press releases\n- Recent verified news articles\n- Industry blog posts from recognized experts\n- Social media from official corporate accounts\n\n### STEP 2: CITATION FORMAT REQUIREMENTS\n\n**IN-TEXT CITATIONS:**\nAccording to Tesla's Q3 2024 financial report, revenue increased by 15% year-over-year (Tesla Inc., 2024). This growth aligns with industry trends identified by McKinsey's automotive analysis (McKinsey & Company, 2024).\n\n**REFERENCES SECTION (APA Format):**\nREFERENCIAS\nTesla Inc. (2024). Quarterly Report Form 10-Q for Q3 2024. Securities and Exchange Commission. https://www.sec.gov/Archives/edgar/data/1318605/000095017024001234/tsla-20240930.htm\nMcKinsey & Company. (2024). The future of automotive: How competitive dynamics are reshaping the industry. McKinsey Global Institute. https://www.mckinsey.com/industries/automotive-and-assembly/our-insights/the-future-of-automotive\nBanco Central de Bolivia. (2024). Reporte de Estabilidad Financiera 2024. Departamento de Estudios Económicos. https://www.bcb.gob.bo/webdocs/publicacionesbcb/2024/ref_2024.pdf\n\n---\n\n## 🔍 ENHANCED RESEARCH METHODOLOGY\n\n### RESEARCH DEPTH REQUIREMENTS\n\n**1. COMPANY OVERVIEW (with sources)**\nRESEARCH & DOCUMENT:\n\nFoundation date and history [Academic source required]\nCurrent market capitalization/size [Financial database required]\nLeadership team and recent changes [Company filings + verified news]\nGeographic presence and operations [Annual reports required]\nCore business model and revenue streams [SEC filings preferred]\n\nCITATION EXAMPLE:\n\"Founded in 2003, Tesla has grown to become the world's most valuable automaker with a market cap exceeding $800 billion as of Q4 2024 (Tesla Inc., 2024; Bloomberg Markets, 2024).\"\n\n**2. COMPETITIVE POSITIONING (evidence-based)**\nRESEARCH & DOCUMENT:\n\nMarket share data with comparative analysis [Industry reports required]\nPricing strategies vs competitors [Market research studies]\nProduct differentiation factors [Technical publications + reviews]\nCustomer satisfaction ratings [Consumer research organizations]\nBrand perception studies [Marketing research firms]\n\nCITATION EXAMPLE:\n\"Tesla maintains a 18.2% share of the global EV market, ahead of BYD's 16.9% (International Energy Agency, 2024), though faces increasing pressure in premium segments from Mercedes-EQS series (J.D. Power, 2024).\"\n\n**3. FINANCIAL PERFORMANCE (data-driven)**\nRESEARCH & DOCUMENT:\n\nRevenue growth trends (5-year analysis) [Annual reports mandatory]\nProfitability metrics vs industry averages [Financial databases]\nInvestment in R&D as percentage of revenue [SEC filings]\nCapital expenditure patterns [Quarterly reports]\nDebt-to-equity ratios and financial health [Credit rating agencies]\n\nCITATION EXAMPLE:\n\"Tesla's R&D investment of $2.9 billion in 2024 represents 3.1% of revenue, below the automotive industry average of 4.2% (McKinsey Global Institute, 2024; Tesla Inc., 2024).\"\n\n---\n\n## 📊 ENHANCED PERPLEXITY RESEARCH QUERIES\n\n### SYSTEMATIC QUERY PROGRESSION\n\n**INITIAL BROAD RESEARCH:**\nQuery 1: \"[Company] financial performance 2024 annual report revenue growth market share\"\nQuery 2: \"[Company] competitive analysis vs [main competitors] market positioning strategy\"\nQuery 3: \"[Company] recent strategic initiatives partnerships acquisitions 2024\"\n\n**DEEP-DIVE SPECIALIZED QUERIES:**\nQuery 4: \"[Company] research development investment innovation pipeline products 2024\"\nQuery 5: \"[Company] customer satisfaction ratings brand perception studies recent surveys\"\nQuery 6: \"[Company] regulatory challenges compliance issues government relations\"\n\n**VERIFICATION & CROSS-REFERENCE QUERIES:**\nQuery 7: \"[Company] third-party analysis institutional investor reports analyst coverage\"\nQuery 8: \"[Company] industry expert opinions academic research peer-reviewed studies\"\nQuery 9: \"[Company] financial press coverage Reuters Bloomberg Financial Times recent\"\n\n---\n\n## 📄 ENHANCED GOOGLE DOC STRUCTURE WITH REFERENCES\n\n### MANDATORY DOCUMENT SECTIONS\n\n**1. EXECUTIVE SUMMARY (150 words max)**\nBrief overview with 2-3 key findings, each with inline citations.\nExample: \"Analysis reveals three critical competitive advantages: market-leading battery technology (Tesla Inc., 2024), superior charging infrastructure (Department of Energy, 2024), and strong brand loyalty scoring 8.7/10 (J.D. Power, 2024).\"\n\n**2. METHODOLOGY & SOURCES OVERVIEW**\nMETODOLOGÍA DE INVESTIGACIÓN\nEste análisis competitivo se basa en:\n\n fuentes académicas y de investigación\n reportes financieros oficiales (SEC, annual reports)\n estudios de mercado de firmas reconocidas\n publicaciones especializadas verificadas\nPeríodo de análisis: [fechas específicas]\nÚltima verificación de fuentes: [fecha actual]\n\nCriterios de selección de fuentes:\n\nMáximo 2 años de antigüedad\nFuentes verificables y accesibles\nMix balanceado de perspectivas institucionales y académicas\n\n\n**3. DETAILED COMPETITIVE ANALYSIS (400-500 words)**\nEvery major finding MUST include:\n- Inline citation\n- Specific data points\n- Comparative context\n- Source credibility indicator\n\n**4. STRATEGIC IMPLICATIONS (100-150 words)**\nRecommendations based on evidence with supporting citations.\n\n**5. COMPREHENSIVE REFERENCES SECTION**\nREFERENCIAS COMPLETAS\nFuentes Primarias (Tier 1)\n\n[Company] Inc. (2024). Annual Report 2024. Securities and Exchange Commission. [URL] (Verificado: [fecha])\nBanco Central de Bolivia. (2024). Reporte Sectorial: Sistema Financiero Boliviano. [URL] (Verificado: [fecha])\n\nFuentes Secundarias Verificadas (Tier 2)\n\nMcKinsey & Company. (2024). Industry Analysis: [Sector] Competitive Landscape. [URL] (Verificado: [fecha])\n\nFuentes de Apoyo (Tier 3)\n\nReuters. (2024). [Company] reports Q3 earnings beat expectations. [URL] (Verificado: [fecha])\n\nNOTA: Todos los enlaces fueron verificados como funcionales en la fecha indicada. Algunas fuentes pueden requerir suscripción para acceso completo.\n\n---\n\n## ⚡ ENHANCED WORKFLOW WITH REFERENCE VALIDATION\n\n### STEP 1: COMPREHENSIVE SOURCE GATHERING (15 minutes)\nEXECUTE QUERIES:\n✅ Query 1-3: Broad company research\n✅ Query 4-6: Deep specialized research\n✅ Query 7-9: Verification and cross-referencing\nCOLLECT & ORGANIZE:\n✅ Minimum 8-10 potential sources identified\n✅ URLs captured and tested for accessibility\n✅ Source credibility assessed (Tier 1/2/3)\n✅ Publication dates verified (max 2 years)\n\n### STEP 2: REFERENCE SELECTION & VALIDATION (10 minutes)\nSELECT FINAL SOURCES:\n✅ Choose best 5-7 sources ensuring mix:\n\n2-3 Tier 1 sources (academic/official)\n2-3 Tier 2 sources (professional/industry)\n1-2 Tier 3 sources (news/corporate)\n\nVALIDATE EACH SOURCE:\n✅ Test URL accessibility\n✅ Verify publication date\n✅ Confirm relevance to analysis\n✅ Check author/publisher credibility\n\n### STEP 3: ANALYSIS WRITING WITH CITATIONS (20 minutes)\nWRITING REQUIREMENTS:\n✅ Every major claim has inline citation\n✅ APA format consistently applied\n✅ Source integration feels natural, not forced\n✅ Balance of paraphrasing and direct quotes (max 15 words per quote)\n✅ Cross-references between sources when applicable\n\n### STEP 4: FINAL VALIDATION & DOC CREATION (10 minutes)\nQUALITY CHECKLIST:\n✅ All URLs tested and functional\n✅ References section complete and formatted\n✅ Minimum 5 verified sources included\n✅ No unsupported claims in analysis\n✅ Document sharing permissions set correctly\n✅ Professional formatting applied\n\n---\n\n## 🚨 QUALITY CONTROL & ESCALATION\n\n### AUTOMATIC REJECTION CRITERIA:\nREJECT AND REQUEST REVISION IF:\n\n< 5 verified sources collected\n\n\n50% of sources are Tier 3 only\n\n\nAny major claim lacks supporting citation\nSources older than 2 years (except for historical context)\nURLs non-functional or require unauthorized access\n\n\n### SUCCESS METRICS:\nREPORT QUALITY INDICATORS:\n\nSource Diversity Score: Mix of Tier 1/2/3 sources ✅\nCitation Density: Minimum 1 citation per 100 words ✅\nLink Functionality: 100% of provided URLs accessible ✅\nRecency Score: Average source age < 12 months ✅\nAcademic Rigor: Proper APA formatting throughout ✅\n\n\n**Remember:** Every analysis must demonstrate academic-level research standards with verifiable sources and proper attribution. No claim should be unsupported by credible evidence."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        220,
+        0
+      ],
+      "id": "5265884b-9598-4af7-9b3f-e873abb31939",
+      "name": "Competitor Research Agent"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "query"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -100,
+        -180
+      ],
+      "id": "4b902a2f-c6ba-440f-a4ee-dc099df62760",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -260,
+        20
+      ],
+      "id": "74cfa23a-0caf-4fcc-a41c-f88a757f3c76",
+      "name": "When chat message received",
+      "webhookId": "1503c53d-1db4-41e0-a35a-fd5bb9b9a742"
+    },
+    {
+      "parameters": {
+        "model": "sonar",
+        "messages": {
+          "message": [
+            {
+              "content": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('message0_Text', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.perplexityTool",
+      "typeVersion": 1,
+      "position": [
+        120,
+        440
+      ],
+      "id": "c47225ef-c7e4-4537-827e-82bc35d98c5b",
+      "name": "Message a model in Perplexity",
+      "credentials": {
+        "perplexityApi": {
+          "id": "0EqpwxtSStLp36nr",
+          "name": "Perplexity account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Competitor Research Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Document": {
+      "ai_tool": [
+        [
+          {
+            "node": "Competitor Research Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Document": {
+      "ai_tool": [
+        [
+          {
+            "node": "Competitor Research Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create New Document": {
+      "ai_tool": [
+        [
+          {
+            "node": "Competitor Research Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Competitor Research Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        []
+      ]
+    },
+    "Message a model in Perplexity": {
+      "ai_tool": [
+        [
+          {
+            "node": "Competitor Research Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "64440696-15cf-4636-83c6-23338dcff03b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "91f378fe60da678632cbae3dbc7580425fa46ba54eec358af5e91b61588d6d8f"
+  },
+  "id": "bgHD6xjEhV21QfJ7",
+  "tags": [
+    {
+      "createdAt": "2025-06-22T03:03:52.692Z",
+      "updatedAt": "2025-06-22T03:03:52.692Z",
+      "id": "ZsblpL1pfX1KZ9tW",
+      "name": "Agents"
+    }
+  ]
+}
