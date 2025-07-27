@@ -79,33 +79,6 @@ services:
     networks:
       - n8n-network
 
-  # supabase-storage:
-  #   image: supabase/storage-api:v0.29.0
-  #   container_name: supabase-storage
-  #   environment:
-  #     ANON_KEY: ${SUPABASE_ANON_KEY}
-  #     SERVICE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
-  #     POSTGREST_URL: http://supabase-rest:3000
-  #     PGRST_JWT_SECRET: ${JWT_SECRET}
-  #     DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/supabase_storage
-  #     FILE_SIZE_LIMIT: 52428800
-  #     STORAGE_BACKEND: file
-  #     FILE_STORAGE_BACKEND_PATH: /var/lib/storage
-  #     TENANT_ID: stub
-  #     REGION: stub
-  #     GLOBAL_S3_BUCKET: stub
-  #     ENABLE_IMAGE_TRANSFORMATION: "false"
-  #     IMGPROXY_URL: ""
-  #   volumes:
-  #     - storage_data:/var/lib/storage
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #     supabase-rest:
-  #       condition: service_started
-  #   networks:
-  #     - n8n-network
-
   supabase-rest:
     image: postgrest/postgrest:v11.2.0
     container_name: supabase-rest
@@ -149,7 +122,27 @@ services:
     ports:
       - "5678:5678"
     volumes:
+      # CONFIGURACIÓN PRINCIPAL - Datos de n8n
       - n8n_data:/home/node/.n8n
+      
+      # MAPEO DE ARCHIVOS LOCALES - ¡NUEVA CONFIGURACIÓN!
+      # Mapea tu carpeta de workflows local al contenedor
+      - ./workflows:/home/node/.n8n/workflows-local:ro
+      
+      # Mapea carpetas específicas para acceso bidireccional
+      - ./workflows/local_n8n:/home/node/.n8n/local-workflows
+      - ./workflows/exports:/home/node/.n8n/exports
+      
+      # Directorio para archivos generados por los agentes
+      - ./data/research-reports:/home/node/.n8n/research-reports
+      - ./data/generated-files:/home/node/.n8n/generated
+      - ./data/temp:/home/node/.n8n/temp
+      
+      # Logs accesibles localmente
+      - ./logs:/home/node/.n8n/logs
+      
+      # Configuraciones personalizadas
+      - ./configs:/home/node/.n8n/configs:ro
     depends_on:
       postgres:
         condition: service_healthy

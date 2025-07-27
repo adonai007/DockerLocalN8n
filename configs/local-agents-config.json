@@ -1,0 +1,22 @@
+{
+  "local_ai": {
+    "ollama": {
+      "base_url": "http://host.docker.internal:11434",
+      "default_model": "deepseek-coder:1.3b"
+    },
+    "lm_studio": {
+      "base_url": "http://host.docker.internal:1234/v1",
+      "api_key": "lm-studio"
+    }
+  },
+  "file_paths": {
+    "research_reports": "/home/node/.n8n/research-reports/completed/",
+    "temp_files": "/home/node/.n8n/temp/",
+    "generated_files": "/home/node/.n8n/generated/"
+  },
+  "workflow_settings": {
+    "default_timeout": 300,
+    "max_retries": 3,
+    "enable_logging": true
+  }
+}
