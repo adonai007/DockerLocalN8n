@@ -1,0 +1,114 @@
+import os
+import json
+from datetime import datetime
+from pathlib import Path
+
+def write_hola_mundo_file():
+    """Tool para escribir archivo 'Hola mundo' con timestamp actual"""
+    
+    try:
+        # Obtener timestamp actual
+        now = datetime.now()
+        timestamp_str = now.strftime('%Y-%m-%d %H:%M:%S')
+        filename_timestamp = now.strftime('%Y-%m-%d_%H-%M-%S')
+        
+        # Configuración de rutas
+        base_path = Path("/home/node/.n8n/research-reports")
+        
+        # Crear directorio si no existe
+        base_path.mkdir(parents=True, exist_ok=True)
+        
+        # Generar nombre de archivo con timestamp
+        filename = f"hola_mundo_{filename_timestamp}.txt"
+        file_path = base_path / filename
+        
+        # Crear contenido del archivo
+        content = f"""Hola mundo!
+
+Fecha y hora de creación: {timestamp_str}
+Generado por: Test Tool Agent - Hola Mundo Writer
+Ubicación: {file_path}
+Testing: ✅ Archivo creado exitosamente
+
+---
+Este es un archivo de prueba generado automáticamente.
+Contenido: Saludo "Hola mundo" con timestamp actual.
+Propósito: Verificar funcionamiento del sistema de archivos.
+
+Detalles técnicos:
+- Directorio base: {base_path}
+- Archivo: {filename}
+- Timestamp: {timestamp_str}
+- Usuario: node (UID 1000)
+- Permisos: 644 (rw-r--r--)
+
+¡Hola mundo desde n8n local! 🌍"""
+        
+        # Escribir archivo
+        with open(file_path, 'w', encoding='utf-8') as f:
+            f.write(content)
+        
+        # Verificar que se escribió correctamente
+        if not file_path.exists():
+            raise IOError("El archivo no se creó correctamente")
+        
+        # Obtener información del archivo
+        file_stats = file_path.stat()
+        file_size = file_stats.st_size
+        file_size_kb = round(file_size / 1024, 2)
+        
+        # Resultado exitoso como STRING para toolCode
+        success_message = f"""✅ Archivo 'Hola mundo' creado exitosamente!
+
+📁 Ubicación: {file_path}
+📝 Nombre: {filename}
+📊 Tamaño: {file_size_kb} KB
+🕐 Creado: {timestamp_str}
+
+📋 Contenido del archivo:
+"Hola mundo!
+Fecha: {timestamp_str}"
+
+🔍 Verificar archivo con:
+docker exec n8n-local cat {file_path}
+docker exec n8n-local ls -la {base_path}
+
+✅ Estado: Archivo verificado como existente"""
+        
+        # Log de éxito (para debugging)
+        print(f"✅ HOLA MUNDO SUCCESS: {filename} ({file_size_kb} KB)")
+        print(f"📁 LOCATION: {file_path}")
+        
+        return success_message
+        
+    except PermissionError as e:
+        error_message = f"""❌ Error de permisos al escribir archivo
+
+🚫 Sin permisos para escribir en: {base_path if 'base_path' in locals() else '/home/node/.n8n/research-reports'}
+⚠️ Error: {str(e)}
+🔧 Solución: Verificar permisos del volumen n8n_data
+🕐 Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"""
+        print(f"❌ PERMISSION ERROR: {str(e)}")
+        return error_message
+        
+    except IOError as e:
+        error_message = f"""❌ Error de E/S al escribir archivo
+
+💾 Error de entrada/salida: {str(e)}
+🔧 Solución: Verificar espacio en disco y configuración
+🕐 Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"""
+        print(f"❌ IO ERROR: {str(e)}")
+        return error_message
+        
+    except Exception as e:
+        error_message = f"""❌ Error inesperado
+
+🔴 Error general: {str(e)}
+🔧 Solución: Revisar logs de n8n para más detalles
+🕐 Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"""
+        print(f"❌ GENERAL ERROR: {str(e)}")
+        return error_message
+
+# Ejecutar la función y retornar usando return explícito
+result_message = write_hola_mundo_file()
+return result_message
