@@ -1,114 +1,257 @@
-import os
-import json
-from datetime import datetime
-from pathlib import Path
-
-def write_hola_mundo_file():
-    """Tool para escribir archivo 'Hola mundo' con timestamp actual"""
-    
-    try:
-        # Obtener timestamp actual
-        now = datetime.now()
-        timestamp_str = now.strftime('%Y-%m-%d %H:%M:%S')
-        filename_timestamp = now.strftime('%Y-%m-%d_%H-%M-%S')
-        
-        # Configuración de rutas
-        base_path = Path("/home/node/.n8n/research-reports")
-        
-        # Crear directorio si no existe
-        base_path.mkdir(parents=True, exist_ok=True)
-        
-        # Generar nombre de archivo con timestamp
-        filename = f"hola_mundo_{filename_timestamp}.txt"
-        file_path = base_path / filename
-        
-        # Crear contenido del archivo
-        content = f"""Hola mundo!
-
-Fecha y hora de creación: {timestamp_str}
-Generado por: Test Tool Agent - Hola Mundo Writer
-Ubicación: {file_path}
-Testing: ✅ Archivo creado exitosamente
-
----
-Este es un archivo de prueba generado automáticamente.
-Contenido: Saludo "Hola mundo" con timestamp actual.
-Propósito: Verificar funcionamiento del sistema de archivos.
-
-Detalles técnicos:
-- Directorio base: {base_path}
-- Archivo: {filename}
-- Timestamp: {timestamp_str}
-- Usuario: node (UID 1000)
-- Permisos: 644 (rw-r--r--)
-
-¡Hola mundo desde n8n local! 🌍"""
-        
-        # Escribir archivo
-        with open(file_path, 'w', encoding='utf-8') as f:
-            f.write(content)
-        
-        # Verificar que se escribió correctamente
-        if not file_path.exists():
-            raise IOError("El archivo no se creó correctamente")
-        
-        # Obtener información del archivo
-        file_stats = file_path.stat()
-        file_size = file_stats.st_size
-        file_size_kb = round(file_size / 1024, 2)
-        
-        # Resultado exitoso como STRING para toolCode
-        success_message = f"""✅ Archivo 'Hola mundo' creado exitosamente!
-
-📁 Ubicación: {file_path}
-📝 Nombre: {filename}
-📊 Tamaño: {file_size_kb} KB
-🕐 Creado: {timestamp_str}
-
-📋 Contenido del archivo:
-"Hola mundo!
-Fecha: {timestamp_str}"
-
-🔍 Verificar archivo con:
-docker exec n8n-local cat {file_path}
-docker exec n8n-local ls -la {base_path}
-
-✅ Estado: Archivo verificado como existente"""
-        
-        # Log de éxito (para debugging)
-        print(f"✅ HOLA MUNDO SUCCESS: {filename} ({file_size_kb} KB)")
-        print(f"📁 LOCATION: {file_path}")
-        
-        return success_message
-        
-    except PermissionError as e:
-        error_message = f"""❌ Error de permisos al escribir archivo
-
-🚫 Sin permisos para escribir en: {base_path if 'base_path' in locals() else '/home/node/.n8n/research-reports'}
-⚠️ Error: {str(e)}
-🔧 Solución: Verificar permisos del volumen n8n_data
-🕐 Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"""
-        print(f"❌ PERMISSION ERROR: {str(e)}")
-        return error_message
-        
-    except IOError as e:
-        error_message = f"""❌ Error de E/S al escribir archivo
-
-💾 Error de entrada/salida: {str(e)}
-🔧 Solución: Verificar espacio en disco y configuración
-🕐 Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"""
-        print(f"❌ IO ERROR: {str(e)}")
-        return error_message
-        
-    except Exception as e:
-        error_message = f"""❌ Error inesperado
-
-🔴 Error general: {str(e)}
-🔧 Solución: Revisar logs de n8n para más detalles
-🕐 Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"""
-        print(f"❌ GENERAL ERROR: {str(e)}")
-        return error_message
-
-# Ejecutar la función y retornar usando return explícito
-result_message = write_hola_mundo_file()
-return result_message
+{
+  "name": "Hola Mundo Writer Agent - Mejorado v2.0",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🧪 HOLA MUNDO WRITER AGENT v2.0 ✅\n\n**Agente especializado en crear y gestionar archivos de prueba con herramientas mejoradas.**\n\n### 🛠️ Mejoras implementadas:\n- **✅ List Files Tool**: Convertido a JavaScript (era Python)\n- **✅ Ruta unificada**: Ambas herramientas usan `/home/node/.n8n/research-reports/`\n- **✅ Manejo de errores**: Mejorado en ambas herramientas\n- **✅ Prompt del agente**: Optimizado para mejor coordinación\n- **✅ Formato consistente**: Misma estructura en ambas herramientas\n\n### 🎯 Funciones principales:\n1. **Escribir archivos** \"Hola mundo\" con timestamp\n2. **Listar archivos** en la carpeta research-reports\n3. **Verificar operaciones** con confirmación automática\n4. **Gestionar directorio** con creación automática\n\n### 📋 Comandos disponibles:\n- `\"escribir hola mundo\"` - Crear archivo con saludo\n- `\"listar archivos\"` - Mostrar contenido de la carpeta\n- `\"estado completo\"` - Vista completa del sistema\n- `\"verificar último\"` - Comprobar último archivo creado",
+        "height": 500,
+        "width": 380,
+        "color": 4
+      },
+      "id": "main-note-1",
+      "name": "Nota Principal",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -120,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⚙️ CONFIGURACIÓN NECESARIA\n\n### 1. Ollama Setup:\n```bash\n# Descargar modelo optimizado\nollama pull qwen2.5:1.5b\n\n# Verificar que funciona\nollama run qwen2.5:1.5b \"Hola\"\n```\n\n### 2. Credenciales n8n:\n- **Ollama URL**: `http://host.docker.internal:11434`\n- **Modelo**: `qwen2.5:1.5b`\n- **Temperature**: 0.3 (para consistencia)\n\n### 3. Directorio objetivo:\n**📁 Ruta**: `/home/node/.n8n/research-reports/`\n**Permisos**: Automáticos (usuario node)\n**Creación**: Automática si no existe\n\n### 4. Archivos generados:\n**Formato**: `hola_mundo_YYYY-MM-DD_HH-MM-SS.txt`\n**Contenido**: Saludo + timestamp + metadata\n**Verificación**: Automática tras creación",
+        "height": 400,
+        "width": 340,
+        "color": 2
+      },
+      "id": "config-note-2",
+      "name": "Nota Configuración",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        620,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🔧 HERRAMIENTAS MEJORADAS\n\n### **Write Tool (JavaScript)**\n- ✅ Ruta corregida y unificada\n- ✅ Creación automática de directorio\n- ✅ Verificación de archivo creado\n- ✅ Manejo de errores robusto\n- ✅ Formato de respuesta consistente\n\n### **List Files Tool (JavaScript)**\n- 🆕 **NUEVO**: Convertido de Python a JavaScript\n- ✅ Misma ruta que Write Tool\n- ✅ Información detallada de archivos\n- ✅ Conteo automático de archivos\n- ✅ Detección de archivos \"hola_mundo\"\n- ✅ Formato de salida estructurado\n\n### **Ventajas de JavaScript unificado**:\n- ⚡ Mayor compatibilidad\n- 🔄 Consistencia entre herramientas\n- 📊 Mejor manejo de datos\n- 🐛 Debugging más fácil",
+        "height": 380,
+        "width": 320,
+        "color": 5
+      },
+      "id": "tools-note-3",
+      "name": "Nota Herramientas",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🧪 COMANDOS DE TESTING\n\n### Para probar el Write Tool:\n```\n\"escribir hola mundo\"\n\"test write\"\n\"crear archivo de prueba\"\n```\n\n### Para probar el List Tool:\n```\n\"listar archivos\"\n\"mostrar archivos\"\n\"list files\"\n```\n\n### Para testing completo:\n```\n\"estado completo\"\n\"verificar sistema\"\n\"mostrar todo\"\n```\n\n### Verificación manual:\n```bash\n# Ver archivos creados\ndocker exec n8n-local ls -la /home/node/.n8n/research-reports/\n\n# Ver contenido del último archivo\ndocker exec n8n-local cat /home/node/.n8n/research-reports/hola_mundo_*.txt\n\n# Contar archivos\ndocker exec n8n-local find /home/node/.n8n/research-reports/ -name \"*.txt\" | wc -l\n```",
+        "height": 420,
+        "width": 360,
+        "color": 7
+      },
+      "id": "testing-note-4",
+      "name": "Nota Testing",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1240,
+        -80
+      ]
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        340,
+        500
+      ],
+      "id": "manual-trigger-1",
+      "name": "Trigger Manual de Prueba"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "query"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        340,
+        640
+      ],
+      "id": "execute-trigger-2",
+      "name": "Ejecutar desde Manager"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        340,
+        780
+      ],
+      "id": "chat-trigger-3",
+      "name": "Chat Trigger",
+      "webhookId": "improved-hola-mundo-chat"
+    },
+    {
+      "parameters": {
+        "model": "qwen2.5:1.5b",
+        "options": {
+          "temperature": 0.3
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        520,
+        860
+      ],
+      "id": "ollama-model-4",
+      "name": "Ollama Qwen 2.5",
+      "credentials": {
+        "ollamaApi": {
+          "id": "ollama-default",
+          "name": "Ollama Local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query || $input.all()[0]?.json?.query || 'escribir hola mundo' }}",
+        "options": {
+          "systemMessage": "# 🧪 HOLA MUNDO WRITER AGENT v2.0 MEJORADO\n\n## 🎯 FUNCIÓN PRINCIPAL\n**Eres un Agente especializado en crear y gestionar archivos \"Hola mundo\" para testing, con herramientas JavaScript mejoradas y unificadas.**\n\n**Objetivos principales:**\n- Crear archivos de prueba simples con \"Hola mundo\" + timestamp\n- Listar y gestionar archivos en `/home/node/.n8n/research-reports/`\n- Proporcionar verificación completa de todas las operaciones\n- Mantener consistencia entre herramientas Write y List\n\n---\n\n## 🛠️ HERRAMIENTAS DISPONIBLES (AMBAS EN JAVASCRIPT)\n\n### **Write Hola Mundo Tool**\n**Propósito:** Crear archivos \"Hola mundo\" con timestamp y metadata\n- **Input:** Contenido \"Hola mundo\" con fecha actual\n- **Output:** Archivo con nombre `hola_mundo_YYYY-MM-DD_HH-MM-SS.txt`\n- **Ubicación:** `/home/node/.n8n/research-reports/`\n- **Verificación:** Confirma existencia y muestra detalles\n- **Manejo de errores:** Creación automática de directorio si no existe\n\n### **List Files Tool** (🆕 MEJORADO - AHORA EN JAVASCRIPT)\n**Propósito:** Listar archivos en la carpeta research-reports\n- **Input:** Opcional - filtro por tipo de archivo\n- **Output:** Lista detallada con nombre, tamaño, fecha, tipo\n- **Funciones:** Conteo total, identificación de archivos \"hola_mundo\"\n- **Formato:** JSON estructurado para fácil lectura\n- **Estadísticas:** Espacio usado, cantidad por tipo\n\n---\n\n## 📋 COMANDOS DISPONIBLES Y PROTOCOLOS\n\n### **\"escribir hola mundo\" / \"test write\" / \"crear archivo\"**\n**Protocolo de ejecución:**\n1. Usar Write Hola Mundo Tool con contenido completo\n2. Verificar que el archivo se creó exitosamente\n3. **OBLIGATORIO:** Ejecutar List Files Tool para mostrar estado actualizado\n4. Proporcionar respuesta completa con detalles y verificación\n\n### **\"listar archivos\" / \"list files\" / \"mostrar archivos\"**\n**Protocolo de ejecución:**\n1. Ejecutar List Files Tool\n2. Mostrar lista formateada con estadísticas\n3. Identificar archivos \"hola_mundo\" vs otros\n4. Proporcionar conteo total y espacio usado\n\n### **\"estado completo\" / \"verificar sistema\"**\n**Protocolo de ejecución:**\n1. Ejecutar List Files Tool para obtener estado actual\n2. Mostrar estadísticas completas del directorio\n3. Verificar último archivo creado (si existe)\n4. Proporcionar resumen de salud del sistema\n\n### **\"verificar último\" / \"último archivo\"**\n**Protocolo de ejecución:**\n1. Ejecutar List Files Tool\n2. Identificar el archivo más reciente\n3. Mostrar detalles específicos del último archivo\n4. Confirmar integridad y accesibilidad\n\n---\n\n## 📄 FORMATO DE CONTENIDO DE ARCHIVOS\n\n**Template estándar para archivos \"hola_mundo\":**\n```\n🌍 ¡Hola mundo!\n\n📅 Fecha y hora de creación: [YYYY-MM-DD HH:MM:SS]\n🤖 Generado por: Hola Mundo Writer Agent v2.0\n📁 Ubicación: [ruta_completa_del_archivo]\n🔧 Herramientas: Write Tool + List Tool (JavaScript)\n📋 Testing: ✅ Archivo creado exitosamente\n\n🔍 Detalles técnicos:\n- Timestamp único: [timestamp_iso]\n- Workflow: Hola Mundo Writer Agent - Mejorado v2.0\n- Directorio: /home/node/.n8n/research-reports/\n- Formato: UTF-8 text file\n\n✅ Estado: Verificado y confirmado\n🎯 Propósito: Testing de herramientas de gestión de archivos\n\n---\nArchivo de prueba generado automáticamente\nSistema: n8n + Ollama + JavaScript Tools\n```\n\n---\n\n## 🎯 PROTOCOLO DE RESPUESTA OBLIGATORIA\n\n### **Para comandos de escritura:**\n```\n✅ **Archivo \"Hola mundo\" creado exitosamente**\n\n📁 **DETALLES DEL ARCHIVO:**\n   └─ Ubicación: [ruta_completa]\n   └─ Nombre: [nombre_con_timestamp]\n   └─ Tamaño: [tamaño_bytes] bytes\n   └─ Creado: [timestamp_legible]\n\n📋 **CONTENIDO GENERADO:**\n\"🌍 ¡Hola mundo!\n📅 Fecha: [fecha_actual]\n🤖 Generado por: Agent v2.0\"\n\n📂 **ESTADO ACTUALIZADO DE RESEARCH-REPORTS:**\n   └─ Total archivos: [número_total]\n   └─ Archivos \"hola_mundo\": [número_hola_mundo]\n   └─ Otros archivos: [número_otros]\n   └─ Espacio usado: [espacio_total] KB\n   └─ Último archivo: [nombre_último] ⭐ NUEVO\n\n🔍 **VERIFICACIÓN MANUAL:**\n   └─ Contenido: `docker exec n8n-local cat [ruta_completa]`\n   └─ Listado: `docker exec n8n-local ls -la [directorio]`\n\n✅ **ESTADO FINAL:** Archivo verificado y sistema actualizado\n```\n\n### **Para comandos de listado:**\n```\n📂 **ARCHIVOS EN RESEARCH-REPORTS**\n\n📊 **ESTADÍSTICAS:**\n   └─ Total archivos: [número]\n   └─ Archivos \"hola_mundo\": [número] \n   └─ Otros archivos: [número]\n   └─ Espacio total: [tamaño] KB\n   └─ Última actualización: [timestamp]\n\n📋 **LISTA DETALLADA:**\n[Para cada archivo:]\n   • [icono] [nombre_archivo]\n     └─ Tamaño: [tamaño] KB | Modificado: [fecha]\n\n🔍 **COMANDOS ÚTILES:**\n   └─ Ver directorio: `docker exec n8n-local ls -la [directorio]`\n   └─ Contar archivos: `find [directorio] -name \"*.txt\" | wc -l`\n\n✅ **ESTADO:** Directorio verificado y accesible\n```\n\n---\n\n## ⚠️ MANEJO DE ERRORES MEJORADO\n\n### **Errores comunes y soluciones:**\n\n**1. Error de permisos de escritura:**\n```\n❌ Error: No se puede escribir en el directorio\n🔧 Solución automática: Intentar crear directorio\n💡 Verificación manual: `docker exec n8n-local mkdir -p [directorio]`\n```\n\n**2. Directorio no encontrado:**\n```\n❌ Error: Directorio research-reports no existe\n🔧 Solución automática: Crear directorio con permisos\n📁 Ruta creada: /home/node/.n8n/research-reports/\n```\n\n**3. Error de herramienta List Files:**\n```\n❌ Error: No se puede listar archivos\n🔧 Verificación: Confirmar que directorio existe y es accesible\n💡 Fallback: Usar Write Tool para crear directorio\n```\n\n**4. Archivo no creado:**\n```\n❌ Error: Archivo no se creó correctamente\n🔧 Diagnóstico: Verificar espacio en disco y permisos\n📋 Información: Mostrar detalles del error específico\n```\n\n### **Protocolo de recuperación:**\n1. **Intentar operación alternativa** (ruta temporal si falla principal)\n2. **Reportar error específico** con detalles técnicos\n3. **Sugerir solución manual** con comandos Docker\n4. **Continuar con otras operaciones** si es posible\n\n---\n\n## 🚀 INSTRUCCIONES DE ACTIVACIÓN\n\n**Comandos rápidos disponibles:**\n- `\"escribir hola mundo\"` → Crear archivo + verificar + listar\n- `\"listar archivos\"` → Mostrar contenido completo de carpeta\n- `\"estado completo\"` → Vista 360° del sistema\n- `\"verificar último\"` → Detalles del archivo más reciente\n\n**REGLAS OBLIGATORIAS:**\n1. **SIEMPRE** usar ambas herramientas en comandos de escritura\n2. **SIEMPRE** proporcionar respuesta completa con verificación\n3. **NUNCA** asumir que una operación fue exitosa sin verificar\n4. **SIEMPRE** incluir comandos Docker para verificación manual\n5. **MANTENER** consistencia en formato de respuestas\n\n**IMPORTANTE:** Ambas herramientas ahora están en JavaScript y funcionan de forma coordinada. El List Files Tool ha sido completamente reescrito desde Python para garantizar compatibilidad total con el Write Tool."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        580,
+        500
+      ],
+      "id": "agent-main-5",
+      "name": "Hola Mundo Writer Agent v2.0"
+    },
+    {
+      "parameters": {
+        "jsCode": "const fs = require('fs');\nconst path = require('path');\n\n// Configuración base\nconst baseDir = '/home/node/.n8n/research-reports/';\nconst query = $input.all()[0]?.json?.query || $json?.query || 'escribir hola mundo';\nconst now = new Date();\n\n// Generar timestamp único\nconst timestamp = now.toISOString().slice(0, 19).replace(/:/g, '-').replace('T', '_');\nconst filename = `hola_mundo_${timestamp}.txt`;\nconst filepath = path.join(baseDir, filename);\n\n// Formatear fecha legible en español\nconst fechaFormateada = now.toLocaleString('es-ES', { \n  timeZone: 'America/La_Paz',\n  year: 'numeric', \n  month: '2-digit', \n  day: '2-digit',\n  hour: '2-digit', \n  minute: '2-digit', \n  second: '2-digit'\n});\n\n// Contenido del archivo mejorado\nconst content = `🌍 ¡Hola mundo!\n\n📅 Fecha y hora de creación: ${fechaFormateada}\n🤖 Generado por: Hola Mundo Writer Agent v2.0\n📁 Ubicación: ${filepath}\n🔧 Herramientas: Write Tool + List Tool (JavaScript)\n📋 Testing: ✅ Archivo creado exitosamente\n\n🔍 Detalles técnicos:\n- Timestamp único: ${timestamp}\n- Workflow: Hola Mundo Writer Agent - Mejorado v2.0\n- Directorio: ${baseDir}\n- Formato: UTF-8 text file\n\n✅ Estado: Verificado y confirmado\n🎯 Propósito: Testing de herramientas de gestión de archivos\n\nComando ejecutado: \"${query}\"\nTimestamp ISO: ${now.toISOString()}\n\n---\nArchivo de prueba generado automáticamente\nSistema: n8n + Ollama + JavaScript Tools\nVersión: 2.0 (Write + List unificados)\n\n🔍 Para verificar manualmente:\n- Ver contenido: docker exec n8n-local cat ${filepath}\n- Listar directorio: docker exec n8n-local ls -la ${baseDir}\n- Contar archivos: docker exec n8n-local find ${baseDir} -name \"*.txt\" | wc -l`;\n\ntry {\n  // Crear directorio si no existe\n  if (!fs.existsSync(baseDir)) {\n    fs.mkdirSync(baseDir, { recursive: true });\n    console.log(`📁 Directorio creado: ${baseDir}`);\n  }\n  \n  // Escribir archivo\n  fs.writeFileSync(filepath, content, 'utf8');\n  \n  // Verificar que existe y obtener estadísticas\n  const fileExists = fs.existsSync(filepath);\n  if (!fileExists) {\n    throw new Error('Archivo no se creó correctamente');\n  }\n  \n  const stats = fs.statSync(filepath);\n  const fileSizeKB = (stats.size / 1024).toFixed(2);\n  \n  // Contar archivos en el directorio para estadísticas\n  const allFiles = fs.readdirSync(baseDir);\n  const holaFiles = allFiles.filter(f => f.startsWith('hola_mundo_'));\n  \n  // Respuesta de éxito estructurada\n  const response = {\n    success: true,\n    message: `✅ **Archivo \"Hola mundo\" creado exitosamente**\\n\\n📁 **DETALLES DEL ARCHIVO:**\\n   └─ Ubicación: ${filepath}\\n   └─ Nombre: ${filename}\\n   └─ Tamaño: ${stats.size} bytes (${fileSizeKB} KB)\\n   └─ Creado: ${fechaFormateada}\\n\\n📋 **CONTENIDO ESCRITO:**\\n\"🌍 ¡Hola mundo!\\n📅 Fecha: ${fechaFormateada}\\n🤖 Generado por: Agent v2.0\"\\n\\n📊 **ESTADÍSTICAS DEL DIRECTORIO:**\\n   └─ Total archivos: ${allFiles.length}\\n   └─ Archivos \"hola_mundo\": ${holaFiles.length}\\n   └─ Otros archivos: ${allFiles.length - holaFiles.length}\\n   └─ Archivo más reciente: ${filename} ⭐ NUEVO\\n\\n🔍 **VERIFICACIÓN MANUAL:**\\n   └─ Contenido: \\`docker exec n8n-local cat ${filepath}\\`\\n   └─ Listado: \\`docker exec n8n-local ls -la ${baseDir}\\`\\n\\n✅ **ESTADO FINAL:** Archivo verificado y confirmado`,\n    file_details: {\n      path: filepath,\n      name: filename,\n      size_bytes: stats.size,\n      size_kb: fileSizeKB,\n      created: fechaFormateada,\n      timestamp: timestamp\n    },\n    directory_stats: {\n      total_files: allFiles.length,\n      hola_mundo_files: holaFiles.length,\n      other_files: allFiles.length - holaFiles.length,\n      directory: baseDir\n    }\n  };\n  \n  return response.message;\n  \n} catch (error) {\n  // Manejo de errores detallado\n  const errorResponse = `❌ **Error al crear archivo \"Hola mundo\"**\\n\\n🔍 **Detalles del error:**\\n   └─ Tipo: ${error.code || 'Error desconocido'}\\n   └─ Mensaje: ${error.message}\\n   └─ Ruta objetivo: ${filepath}\\n\\n💡 **Posibles soluciones:**\\n   └─ Verificar permisos: \\`docker exec n8n-local ls -la ${path.dirname(baseDir)}\\`\\n   └─ Crear directorio: \\`docker exec n8n-local mkdir -p ${baseDir}\\`\\n   └─ Verificar espacio: \\`docker exec n8n-local df -h\\`\\n\\n🛠️ **Diagnóstico:**\\n   └─ Directorio existe: ${fs.existsSync(baseDir) ? '✅ Sí' : '❌ No'}\\n   └─ Permisos de escritura: ${error.code === 'EACCES' ? '❌ Sin permisos' : '❓ Verificar'}\\n   └─ Espacio disponible: ${error.code === 'ENOSPC' ? '❌ Sin espacio' : '❓ Verificar'}\\n\\n⚠️ **Acción requerida:** Revisar configuración de Docker y permisos del directorio`;\n  \n  return errorResponse;\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.3,
+      "position": [
+        740,
+        860
+      ],
+      "id": "write-tool-6",
+      "name": "Write Hola Mundo Tool v2.0"
+    },
+    {
+      "parameters": {
+        "jsCode": "const fs = require('fs');\nconst path = require('path');\n\n// Configuración base (misma ruta que Write Tool)\nconst baseDir = '/home/node/.n8n/research-reports/';\nconst now = new Date();\n\n// Formatear timestamp actual\nconst timestampConsulta = now.toLocaleString('es-ES', { \n  timeZone: 'America/La_Paz',\n  year: 'numeric', \n  month: '2-digit', \n  day: '2-digit',\n  hour: '2-digit', \n  minute: '2-digit', \n  second: '2-digit'\n});\n\ntry {\n  // Verificar si el directorio existe\n  if (!fs.existsSync(baseDir)) {\n    // Intentar crear el directorio\n    try {\n      fs.mkdirSync(baseDir, { recursive: true });\n    } catch (createError) {\n      return `❌ **Error: Directorio no encontrado y no se pudo crear**\\n\\n🔍 **Problema:**\\n   └─ Directorio: ${baseDir}\\n   └─ Error: ${createError.message}\\n\\n💡 **Solución manual:**\\n   └─ Crear directorio: \\`docker exec n8n-local mkdir -p ${baseDir}\\`\\n   └─ Verificar permisos: \\`docker exec n8n-local ls -la ${path.dirname(baseDir)}\\`\\n\\n📋 **Recomendación:** Ejecutar Write Tool primero para crear la estructura`;\n    }\n  }\n  \n  // Leer archivos del directorio\n  const files = fs.readdirSync(baseDir);\n  \n  // Si no hay archivos\n  if (files.length === 0) {\n    return `📂 **DIRECTORIO RESEARCH-REPORTS**\\n\\n📊 **ESTADO:**\\n   └─ Directorio: ${baseDir}\\n   └─ Estado: ✅ Existe y accesible\\n   └─ Contenido: 📭 Vacío (0 archivos)\\n   └─ Consultado: ${timestampConsulta}\\n\\n💡 **Sugerencia:**\\n   └─ Crear archivo de prueba: \"escribir hola mundo\"\\n   └─ Verificar directorio: \\`docker exec n8n-local ls -la ${baseDir}\\`\\n\\n✅ **ESTADO FINAL:** Directorio listo para recibir archivos`;\n  }\n  \n  // Procesar información de cada archivo\n  const filesInfo = [];\n  let totalSize = 0;\n  let holaWorldCount = 0;\n  let latestFile = null;\n  let latestTime = 0;\n  \n  files.forEach(filename => {\n    const filepath = path.join(baseDir, filename);\n    \n    try {\n      const stats = fs.statSync(filepath);\n      \n      // Solo procesar archivos (no directorios)\n      if (stats.isFile()) {\n        const sizeKB = (stats.size / 1024).toFixed(2);\n        const modifiedTime = stats.mtime;\n        const formattedDate = modifiedTime.toLocaleString('es-ES', {\n          timeZone: 'America/La_Paz',\n          year: 'numeric',\n          month: '2-digit', \n          day: '2-digit',\n          hour: '2-digit',\n          minute: '2-digit'\n        });\n        \n        const isHolaMundo = filename.startsWith('hola_mundo_');\n        if (isHolaMundo) holaWorldCount++;\n        \n        // Encontrar archivo más reciente\n        if (modifiedTime.getTime() > latestTime) {\n          latestTime = modifiedTime.getTime();\n          latestFile = {\n            name: filename,\n            size: sizeKB,\n            date: formattedDate,\n            isHolaMundo: isHolaMundo\n          };\n        }\n        \n        filesInfo.push({\n          name: filename,\n          size_kb: sizeKB,\n          size_bytes: stats.size,\n          modified: formattedDate,\n          extension: path.extname(filename),\n          is_hola_mundo: isHolaMundo,\n          modified_timestamp: modifiedTime.getTime()\n        });\n        \n        totalSize += stats.size;\n      }\n    } catch (fileError) {\n      // Si hay error con un archivo específico, continuar con los demás\n      console.log(`Error procesando archivo ${filename}: ${fileError.message}`);\n    }\n  });\n  \n  // Ordenar archivos por fecha de modificación (más reciente primero)\n  filesInfo.sort((a, b) => b.modified_timestamp - a.modified_timestamp);\n  \n  // Calcular estadísticas\n  const totalSizeKB = (totalSize / 1024).toFixed(2);\n  const otherFilesCount = filesInfo.length - holaWorldCount;\n  \n  // Construir respuesta formateada\n  let response = `📂 **ARCHIVOS EN RESEARCH-REPORTS**\\n\\n`;\n  \n  // Estadísticas generales\n  response += `📊 **ESTADÍSTICAS:**\\n`;\n  response += `   └─ Total archivos: ${filesInfo.length}\\n`;\n  response += `   └─ Archivos \"hola_mundo\": ${holaWorldCount}\\n`;\n  response += `   └─ Otros archivos: ${otherFilesCount}\\n`;\n  response += `   └─ Espacio total: ${totalSizeKB} KB\\n`;\n  response += `   └─ Consultado: ${timestampConsulta}\\n\\n`;\n  \n  // Lista de archivos\n  response += `📋 **LISTA DETALLADA:**\\n`;\n  \n  filesInfo.forEach((file, index) => {\n    const icon = file.is_hola_mundo ? '🧪' : '📄';\n    const isLatest = latestFile && file.name === latestFile.name ? ' ⭐ MÁS RECIENTE' : '';\n    \n    response += `   ${index + 1}. ${icon} ${file.name}${isLatest}\\n`;\n    response += `      └─ ${file.size_kb} KB | ${file.modified}\\n`;\n  });\n  \n  // Archivo más reciente destacado\n  if (latestFile) {\n    const latestIcon = latestFile.isHolaMundo ? '🧪' : '📄';\n    response += `\\n🕐 **ARCHIVO MÁS RECIENTE:**\\n`;\n    response += `   └─ ${latestIcon} ${latestFile.name}\\n`;\n    response += `   └─ ${latestFile.size} KB | ${latestFile.date}\\n`;\n  }\n  \n  // Comandos útiles\n  response += `\\n🔍 **COMANDOS ÚTILES:**\\n`;\n  response += `   └─ Ver directorio: \\`docker exec n8n-local ls -la ${baseDir}\\`\\n`;\n  response += `   └─ Contar archivos: \\`docker exec n8n-local find ${baseDir} -name \"*.txt\" | wc -l\\`\\n`;\n  if (latestFile) {\n    response += `   └─ Ver último archivo: \\`docker exec n8n-local cat ${baseDir}${latestFile.name}\\`\\n`;\n  }\n  \n  response += `\\n✅ **ESTADO:** Directorio verificado y accesible`;\n  \n  return response;\n  \n} catch (error) {\n  // Manejo de errores\n  return `❌ **Error al listar archivos**\\n\\n🔍 **Detalles del error:**\\n   └─ Tipo: ${error.code || 'Error desconocido'}\\n   └─ Mensaje: ${error.message}\\n   └─ Directorio: ${baseDir}\\n\\n💡 **Posibles soluciones:**\\n   └─ Verificar existencia: \\`docker exec n8n-local ls -la ${path.dirname(baseDir)}\\`\\n   └─ Crear directorio: \\`docker exec n8n-local mkdir -p ${baseDir}\\`\\n   └─ Verificar permisos: \\`docker exec n8n-local chmod 755 ${baseDir}\\`\\n\\n🛠️ **Diagnóstico:**\\n   └─ Error de permisos: ${error.code === 'EACCES' ? '❌ Sin acceso' : '❓ Verificar'}\\n   └─ Directorio no existe: ${error.code === 'ENOENT' ? '❌ No encontrado' : '❓ Verificar'}\\n\\n⚠️ **Recomendación:** Ejecutar Write Tool primero para crear estructura de directorio`;\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.3,
+      "position": [
+        940,
+        860
+      ],
+      "id": "list-tool-7",
+      "name": "List Files Tool v2.0 (JavaScript)"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "manual-trigger-1": {
+      "main": [
+        [
+          {
+            "node": "agent-main-5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "execute-trigger-2": {
+      "main": [
+        [
+          {
+            "node": "agent-main-5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "chat-trigger-3": {
+      "main": [
+        [
+          {
+            "node": "agent-main-5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ollama-model-4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "agent-main-5",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "write-tool-6": {
+      "ai_tool": [
+        [
+          {
+            "node": "agent-main-5",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "list-tool-7": {
+      "ai_tool": [
+        [
+          {
+            "node": "agent-main-5",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "improved-hola-mundo-v2",
+  "meta": {
+    "instanceId": "hola-mundo-writer-improved-2024"
+  },
+  "id": "HolaMundoWriterV2",
+  "tags": ["testing", "file-management", "javascript-tools"]
+}
