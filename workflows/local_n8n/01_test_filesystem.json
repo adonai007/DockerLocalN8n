@@ -1,0 +1,243 @@
+{
+  "name": "Agente de Prueba Local - Filesystem Testing",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🧪 Agente de Prueba Local\n\n**Agente especializado en testing de herramientas filesystem locales.**\n\n### Características principales:\n- **Modelo:** Ollama Local (deepseek-coder:1.3b)\n- **Propósito:** Testing y validación de filesystem\n- **Output:** Archivos de prueba locales\n- **Datos:** Completamente privados y locales\n\n### Funciones del agente:\n1. Crear archivos de prueba\n2. Leer archivos existentes\n3. Listar contenido de directorios\n4. Validar operaciones filesystem\n5. Reportar resultados de testing\n\n### Comandos disponibles:\n- `\"test write\"` - Crear archivo de prueba\n- `\"test read\"` - Leer archivo existente\n- `\"test list\"` - Listar archivos\n- `\"test all\"` - Ejecutar todas las pruebas",
+        "height": 400,
+        "width": 350,
+        "color": 4
+      },
+      "id": "1a2b3c4d-5e6f-7890-abcd-ef1234567890",
+      "name": "Nota Principal del Workflow",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        -200
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⚙️ CONFIGURACIÓN REQUERIDA\n\n### 1. Ollama Setup:\n```bash\n# Instalar y ejecutar Ollama\nollama pull deepseek-coder:1.3b\nollama serve\n```\n\n### 2. Configuración n8n:\n- **Ollama URL:** `http://host.docker.internal:11434`\n- **Modelo:** `deepseek-coder:1.3b`\n- **Temperature:** 0.3 (consistencia)\n\n### 3. Directorio de Testing:\n**Automático en volumen n8n_data:**\n`/home/node/.n8n/filesystem-tests/`\n\n**Subdirectorios creados automáticamente:**\n- `/tests/` - Archivos de prueba\n- `/samples/` - Datos de ejemplo\n- `/reports/` - Reportes de testing\n\n### 4. Permisos:\n- Usuario node (UID 1000) automático\n- Escritura en volumen existente\n- Sin configuración adicional requerida",
+        "height": 420,
+        "width": 400,
+        "color": 2
+      },
+      "id": "2b3c4d5e-6f78-9012-3456-789abcdef012",
+      "name": "Nota de Configuración",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        -240
+      ]
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -280,
+        120
+      ],
+      "id": "3c4d5e6f-7890-1234-5678-90abcdef1234",
+      "name": "Trigger Manual de Prueba"
+    },
+    {
+      "parameters": {
+        "model": "deepseek-coder:1.3b",
+        "options": {
+          "temperature": 0.3
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        120,
+        240
+      ],
+      "id": "4d5e6f78-9012-3456-7890-abcdef123456",
+      "name": "Modelo Ollama Local",
+      "credentials": {
+        "ollamaApi": {
+          "id": "ollama-local-credentials",
+          "name": "Ollama Local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query || 'test filesystem tools' }}",
+        "options": {
+          "systemMessage": "# 🧪 FILESYSTEM TESTING AGENT v1.0\n\n## 🎯 FUNCIÓN PRINCIPAL\n\n**Eres un Agente de Testing especializado en validar herramientas filesystem locales.**\n\n**Objetivo:** Probar y validar todas las operaciones de archivos disponibles de manera sistemática.\n\n---\n\n## 🛠️ HERRAMIENTAS DISPONIBLES\n\n### **1. Filesystem Write Tool**\n**Propósito:** Crear archivos de prueba\n- `filename`: Nombre del archivo (opcional, auto-generado)\n- `content`: Contenido del archivo\n- `directory`: Directorio destino (opcional)\n\n### **2. Filesystem Read Tool**  \n**Propósito:** Leer archivos existentes\n- `file_path`: Ruta completa del archivo a leer\n\n### **3. Filesystem List Tool**\n**Propósito:** Listar archivos en directorio\n- `directory`: Directorio a listar (opcional)\n- `filter`: Filtro de archivos (opcional)\n\n---\n\n## 📋 COMANDOS DE TESTING\n\n### **\"test write\"** → Prueba de escritura\n1. Crear archivo de prueba con contenido simple\n2. Confirmar creación exitosa\n3. Reportar ruta y metadata\n\n### **\"test read\"** → Prueba de lectura\n1. Listar archivos disponibles\n2. Leer un archivo específico\n3. Mostrar contenido\n\n### **\"test list\"** → Prueba de listado\n1. Listar directorio principal\n2. Mostrar estructura de archivos\n3. Reportar cantidad y tipos\n\n### **\"test all\"** → Prueba completa\n1. Ejecutar todas las pruebas anteriores\n2. Crear archivo de reporte\n3. Validar todas las operaciones\n\n### **\"test [contenido]\"** → Prueba personalizada\n1. Crear archivo con el contenido especificado\n2. Validar escritura y lectura\n3. Reportar resultados\n\n---\n\n## 📄 TEMPLATE DE ARCHIVO DE PRUEBA\n\n```\n# Test File: [TIMESTAMP]\n**Creado:** [YYYY-MM-DD HH:MM:SS]\n**Agente:** Filesystem Testing Agent\n**Prueba:** [tipo_de_prueba]\n\n## Contenido de Prueba\n[contenido_específico]\n\n## Metadata\n- Tamaño: [bytes]\n- Ubicación: [ruta_completa]\n- Estado: ✅ Creado exitosamente\n```\n\n---\n\n## 🎯 PROTOCOLO DE TESTING\n\n### **PASO 1: Identificar tipo de prueba**\nAnalizar comando del usuario y determinar operación.\n\n### **PASO 2: Ejecutar herramienta correspondiente**\nUsar la herramienta filesystem apropiada con parámetros correctos.\n\n### **PASO 3: Validar resultado**\nConfirmar que la operación fue exitosa y obtener metadata.\n\n### **PASO 4: Respuesta estructurada OBLIGATORIA**\n```\n🧪 **Test completado exitosamente**\n\n🔧 **Operación ejecutada:** [tipo_operación]\n🛠️ **Herramienta usada:** [nombre_herramienta]\n\n📁 **Resultado:**\n- Archivo: [nombre_archivo]\n- Ruta: [ruta_completa]\n- Tamaño: [tamaño_KB] KB\n- Estado: ✅ [estado]\n\n📊 **Detalles técnicos:**\n[metadata_específica]\n\n🧪 **Para verificar manualmente:**\n`docker exec n8n-local ls -la [directorio]`\n`docker exec n8n-local cat [archivo]`\n```\n\n---\n\n## ⚠️ MANEJO DE ERRORES\n\n### **Error de permisos:**\n- Reportar directorio alternativo\n- Sugerir comandos de verificación\n\n### **Error de archivo no encontrado:**\n- Listar archivos disponibles\n- Sugerir crear nuevo archivo\n\n### **Error de escritura:**\n- Verificar espacio en disco\n- Intentar directorio temporal\n\n**Directorio base:** `/home/node/.n8n/filesystem-tests/`\n**Naming pattern:** `test_[tipo]_[YYYY-MM-DD-HH-MM].txt`\n\n**IMPORTANTE:** Siempre confirmar que las operaciones fueron exitosas y proporcionar comandos para verificación manual."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        -40,
+        120
+      ],
+      "id": "5e6f7890-1234-5678-9012-3456789abcde",
+      "name": "Agente de Testing Filesystem"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filesystem Write Tool - Crea archivos de prueba en directorio local\nconst fs = require('fs');\nconst path = require('path');\n\n// Obtener parámetros del agent\nconst filename = $fromAI('filename', '', 'string');\nconst content = $fromAI('content', '', 'string');\nconst directory = $fromAI('directory', '', 'string');\n\n// Directorio base para tests\nconst baseDir = directory || '/home/node/.n8n/filesystem-tests';\nconst testsDir = path.join(baseDir, 'tests');\n\ntry {\n  // Crear directorios si no existen\n  if (!fs.existsSync(baseDir)) {\n    fs.mkdirSync(baseDir, { recursive: true });\n  }\n  if (!fs.existsSync(testsDir)) {\n    fs.mkdirSync(testsDir, { recursive: true });\n  }\n  \n  // Generar nombre de archivo si no se proporciona\n  let finalFilename = filename;\n  if (!finalFilename) {\n    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');\n    finalFilename = `test_file_${timestamp}.txt`;\n  }\n  \n  // Asegurar extensión si no la tiene\n  if (!path.extname(finalFilename)) {\n    finalFilename += '.txt';\n  }\n  \n  const fullPath = path.join(testsDir, finalFilename);\n  \n  // Preparar contenido con metadata\n  const timestamp = new Date().toISOString();\n  const defaultContent = `# Test File: ${finalFilename}\\n**Creado:** ${timestamp}\\n**Agente:** Filesystem Testing Agent\\n**Prueba:** Write Operation Test\\n\\n## Contenido de Prueba\\n${content || 'Archivo de prueba creado exitosamente.'}\\n\\n## Metadata\\n- Timestamp: ${timestamp}\\n- Ubicación: ${fullPath}\\n- Estado: ✅ Creado exitosamente`;\n  \n  // Verificar si el archivo existe y crear versión si es necesario\n  let finalPath = fullPath;\n  if (fs.existsSync(fullPath)) {\n    const baseName = path.basename(finalFilename, path.extname(finalFilename));\n    const extension = path.extname(finalFilename);\n    let counter = 1;\n    \n    do {\n      const versionedName = `${baseName}_v${counter}${extension}`;\n      finalPath = path.join(testsDir, versionedName);\n      counter++;\n    } while (fs.existsSync(finalPath));\n    \n    finalFilename = path.basename(finalPath);\n  }\n  \n  // Escribir archivo\n  fs.writeFileSync(finalPath, defaultContent, 'utf8');\n  \n  // Obtener stats del archivo creado\n  const stats = fs.statSync(finalPath);\n  \n  return {\n    success: true,\n    operation: 'write',\n    filename: finalFilename,\n    file_path: finalPath,\n    directory: testsDir,\n    size_bytes: stats.size,\n    size_kb: Math.round(stats.size / 1024 * 100) / 100,\n    created_at: stats.birthtime.toISOString(),\n    message: `✅ Archivo creado exitosamente: ${finalFilename}`,\n    verification_commands: [\n      `docker exec n8n-local ls -la ${testsDir}`,\n      `docker exec n8n-local cat ${finalPath}`\n    ],\n    content_preview: defaultContent.substring(0, 150) + '...'\n  };\n  \n} catch (error) {\n  return {\n    success: false,\n    operation: 'write',\n    error: error.message,\n    error_type: error.code,\n    attempted_path: fullPath || 'undefined',\n    directory: baseDir,\n    message: `❌ Error al crear archivo: ${error.message}`,\n    troubleshooting: [\n      'Verificar permisos del directorio',\n      'Confirmar montaje del volumen n8n_data',\n      `Crear directorio manualmente: docker exec n8n-local mkdir -p ${testsDir}`\n    ]\n  };\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        280,
+        -40
+      ],
+      "id": "6f789012-3456-7890-1234-56789abcdef0",
+      "name": "Filesystem Write Tool"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filesystem Read Tool - Lee archivos del directorio de tests\nconst fs = require('fs');\nconst path = require('path');\n\n// Obtener parámetros del agent\nconst filePath = $fromAI('file_path', '', 'string');\n\ntry {\n  // Si no se proporciona ruta, usar directorio por defecto\n  let targetPath = filePath;\n  if (!targetPath) {\n    return {\n      success: false,\n      operation: 'read',\n      error: 'file_path parameter required',\n      message: '❌ Debe especificar la ruta del archivo a leer',\n      suggestion: 'Usar Filesystem List Tool primero para ver archivos disponibles'\n    };\n  }\n  \n  // Verificar si el archivo existe\n  if (!fs.existsSync(targetPath)) {\n    return {\n      success: false,\n      operation: 'read',\n      error: 'file_not_found',\n      file_path: targetPath,\n      message: `❌ Archivo no encontrado: ${path.basename(targetPath)}`,\n      suggestion: 'Verificar ruta o crear archivo con Write Tool'\n    };\n  }\n  \n  // Leer contenido del archivo\n  const content = fs.readFileSync(targetPath, 'utf8');\n  \n  // Obtener metadata del archivo\n  const stats = fs.statSync(targetPath);\n  \n  return {\n    success: true,\n    operation: 'read',\n    filename: path.basename(targetPath),\n    file_path: targetPath,\n    content: content,\n    size_bytes: stats.size,\n    size_kb: Math.round(stats.size / 1024 * 100) / 100,\n    created_at: stats.birthtime.toISOString(),\n    modified_at: stats.mtime.toISOString(),\n    message: `✅ Archivo leído exitosamente: ${path.basename(targetPath)}`,\n    content_lines: content.split('\\n').length,\n    content_preview: content.length > 300 ? content.substring(0, 300) + '...' : content\n  };\n  \n} catch (error) {\n  return {\n    success: false,\n    operation: 'read',\n    error: error.message,\n    error_type: error.code,\n    file_path: targetPath,\n    message: `❌ Error al leer archivo: ${error.message}`,\n    troubleshooting: [\n      'Verificar que el archivo existe',\n      'Confirmar permisos de lectura',\n      'Usar ruta completa del archivo'\n    ]\n  };\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        120
+      ],
+      "id": "789012345-6789-0123-4567-89abcdef0123",
+      "name": "Filesystem Read Tool"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filesystem List Tool - Lista archivos en directorio de tests\nconst fs = require('fs');\nconst path = require('path');\n\n// Obtener parámetros del agent\nconst directory = $fromAI('directory', '/home/node/.n8n/filesystem-tests', 'string');\nconst filter = $fromAI('filter', '', 'string');\n\ntry {\n  // Verificar si el directorio existe\n  if (!fs.existsSync(directory)) {\n    return {\n      success: true,\n      operation: 'list',\n      directory: directory,\n      files: [],\n      total_files: 0,\n      message: `📁 Directorio no existe: ${directory}`,\n      suggestion: 'Crear primer archivo con Write Tool para inicializar'\n    };\n  }\n  \n  // Función para obtener archivos recursivamente\n  const getAllFiles = (dir, fileList = []) => {\n    const items = fs.readdirSync(dir);\n    \n    items.forEach(item => {\n      const fullPath = path.join(dir, item);\n      const stat = fs.statSync(fullPath);\n      \n      if (stat.isDirectory()) {\n        getAllFiles(fullPath, fileList);\n      } else {\n        fileList.push(fullPath);\n      }\n    });\n    \n    return fileList;\n  };\n  \n  const allFiles = getAllFiles(directory);\n  \n  // Aplicar filtro si se proporciona\n  let filteredFiles = allFiles;\n  if (filter) {\n    const filterLower = filter.toLowerCase();\n    filteredFiles = allFiles.filter(file => \n      path.basename(file).toLowerCase().includes(filterLower)\n    );\n  }\n  \n  // Obtener metadata de cada archivo\n  const fileDetails = filteredFiles.map(filePath => {\n    const stats = fs.statSync(filePath);\n    const relativePath = path.relative(directory, filePath);\n    \n    return {\n      filename: path.basename(filePath),\n      relative_path: relativePath,\n      full_path: filePath,\n      size_bytes: stats.size,\n      size_kb: Math.round(stats.size / 1024 * 100) / 100,\n      extension: path.extname(filePath),\n      created_at: stats.birthtime.toISOString(),\n      modified_at: stats.mtime.toISOString(),\n      subdirectory: path.dirname(relativePath)\n    };\n  });\n  \n  // Ordenar por fecha de modificación (más reciente primero)\n  fileDetails.sort((a, b) => new Date(b.modified_at) - new Date(a.modified_at));\n  \n  // Estadísticas del directorio\n  const extensions = {};\n  fileDetails.forEach(file => {\n    const ext = file.extension || 'sin_extensión';\n    extensions[ext] = (extensions[ext] || 0) + 1;\n  });\n  \n  return {\n    success: true,\n    operation: 'list',\n    directory: directory,\n    total_files: allFiles.length,\n    filtered_files: filteredFiles.length,\n    filter_applied: filter || 'ninguno',\n    files: fileDetails,\n    extensions: extensions,\n    message: `📁 Encontrados ${filteredFiles.length} archivos en ${directory}`,\n    recent_files: fileDetails.slice(0, 5).map(f => f.filename),\n    verification_command: `docker exec n8n-local ls -la ${directory}`\n  };\n  \n} catch (error) {\n  return {\n    success: false,\n    operation: 'list',\n    error: error.message,\n    error_type: error.code,\n    directory: directory,\n    message: `❌ Error al listar archivos: ${error.message}`,\n    troubleshooting: [\n      'Verificar que el directorio existe',\n      'Confirmar permisos de lectura',\n      'Crear directorio con Write Tool'\n    ]\n  };\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        280
+      ],
+      "id": "8901234567-8901-2345-6789-0123456789ab",
+      "name": "Filesystem List Tool"
+    },
+    {
+      "parameters": {
+        "content": "## 🛠️ HERRAMIENTAS DE FILESYSTEM\n\n### Write Tool:\n- **Función:** Crear archivos de prueba\n- **Input:** filename, content, directory\n- **Output:** Ruta y metadata del archivo\n- **Auto-features:** Naming automático, versioning\n\n### Read Tool:\n- **Función:** Leer archivos existentes\n- **Input:** file_path (requerido)\n- **Output:** Contenido completo + metadata\n- **Validación:** Existencia y permisos\n\n### List Tool:\n- **Función:** Listar archivos en directorio\n- **Input:** directory, filter (opcionales)\n- **Output:** Array de archivos + estadísticas\n- **Features:** Búsqueda recursiva, filtros\n\n### Directorio base:\n`/home/node/.n8n/filesystem-tests/tests/`",
+        "height": 340,
+        "width": 300,
+        "color": 4
+      },
+      "id": "9012345678-9012-3456-7890-123456789abc",
+      "name": "Nota Herramientas",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        620,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⚠️ TROUBLESHOOTING\n\n### Errores Comunes:\n\n**Ollama no responde:**\n- Verificar: `ollama serve`\n- Modelo: `ollama pull deepseek-coder:1.3b`\n- URL: `http://host.docker.internal:11434`\n\n**Error de permisos:**\n- Automático en volumen n8n_data\n- Usuario node (UID 1000)\n- Sin configuración adicional\n\n**Archivos no se crean:**\n- Verificar espacio en disco\n- Confirmar volumen montado\n- Usar comandos de verificación\n\n**Verificar manualmente:**\n```bash\n# Listar archivos creados\ndocker exec n8n-local ls -la /home/node/.n8n/filesystem-tests/\n\n# Ver contenido de archivo\ndocker exec n8n-local cat /home/node/.n8n/filesystem-tests/tests/test_*.txt\n```",
+        "height": 380,
+        "width": 340,
+        "color": 5
+      },
+      "id": "0123456789-0123-4567-8901-23456789abcd",
+      "name": "Nota Troubleshooting",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        800,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🔄 FLUJO DE TESTING\n\n### Comandos Disponibles:\n\n**Testing Básico:**\n- `test write` - Crear archivo\n- `test read` - Leer archivo  \n- `test list` - Listar archivos\n- `test all` - Todas las pruebas\n\n**Testing Personalizado:**\n- `crear archivo con contenido: [texto]`\n- `leer archivo: [ruta]`\n- `listar directorio: [path]`\n\n### Flujo Típico:\n1. **Input:** Comando de usuario\n2. **Agent:** Analiza y selecciona tool\n3. **Tool:** Ejecuta operación filesystem\n4. **Output:** Resultado + metadata\n5. **Verification:** Comandos docker\n\n### Respuesta Estructurada:\n✅ Estado, 📁 Archivo, 🔧 Metadata",
+        "height": 320,
+        "width": 280,
+        "color": 7
+      },
+      "id": "123456789a-1234-5678-9012-3456789abcde",
+      "name": "Nota Flujo Testing",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        360,
+        -200
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Trigger Manual de Prueba": {
+      "main": [
+        [
+          {
+            "node": "Agente de Testing Filesystem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Modelo Ollama Local": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente de Testing Filesystem",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filesystem Write Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente de Testing Filesystem",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filesystem Read Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente de Testing Filesystem",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filesystem List Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente de Testing Filesystem",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "test-agent-filesystem-v1",
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": "test-123e4567-e89b-12d3-a456-426614174000"
+  },
+  "id": "TestAgentFilesystem",
+  "tags": ["testing", "filesystem", "local", "agente"]
+}

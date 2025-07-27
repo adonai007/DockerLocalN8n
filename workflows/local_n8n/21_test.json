@@ -1,0 +1,295 @@
+{
+  "name": "AGNT_21_ResearchAgent_Local",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🔍 Research Agent Local\n\n**Agente de investigación competitiva que funciona completamente local.**\n\n### Características principales:\n- **Modelo:** Ollama DeepSeek Coder (local)\n- **Investigación:** Perplexity API (externa)\n- **Output:** Archivos markdown locales\n- **Datos:** Completamente privados\n\n### Flujo del proceso:\n1. Recibe consulta de investigación\n2. Investiga con Perplexity\n3. Genera reporte markdown\n4. Guarda archivo local\n5. Retorna ruta del archivo",
+        "height": 400,
+        "width": 350,
+        "color": 4
+      },
+      "id": "nota-main-workflow",
+      "name": "Nota Principal del Workflow",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [50, 50]
+    },
+    {
+      "parameters": {
+        "content": "## ⚙️ CONFIGURACIÓN REQUERIDA\n\n### 1. Ollama Setup:\n```bash\nollama pull deepseek-coder:1.3b\nollama serve\n```\n\n### 2. Perplexity API:\n- Configurar credenciales\n- Model: sonar-pro\n\n### 3. Directorio Docker:\n**Automático en volumen n8n_data:**\n`/home/node/.n8n/research-reports/`\n\n**Subdirectorios creados automáticamente:**\n- `/completed/` - Reportes finalizados\n- `/temp/` - Archivos temporales\n- `/samples/` - Datos de prueba\n\n### 4. Permisos:\n- Usuario node (UID 1000) automático\n- Escritura en volumen existente",
+        "height": 380,
+        "width": 340,
+        "color": 2
+      },
+      "id": "nota-configuration",
+      "name": "Nota de Configuración",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [450, 50]
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "query",
+              "type": "string",
+              "description": "Consulta de investigación competitiva"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [200, 300],
+      "id": "trigger-workflow-execution",
+      "name": "Ejecutar desde Manager"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [200, 450],
+      "id": "trigger-manual-test",
+      "name": "Test Manual"
+    },
+    {
+      "parameters": {
+        "baseURL": "http://host.docker.internal:11434",
+        "model": "deepseek-coder:1.3b",
+        "options": {
+          "temperature": 0.3,
+          "maxTokens": 4000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [420, 200],
+      "id": "ollama-chat-model",
+      "name": "Ollama DeepSeek Coder"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query || 'Realizar investigación competitiva' }}",
+        "options": {
+          "systemMessage": "# RESEARCH AGENT LOCAL - MODO TESTING v1.0\n\n## 🎯 FUNCIÓN PRINCIPAL\n\n**Eres un Research Agent optimizado para TESTING de herramientas filesystem locales.**\n\n**Objetivo:** Probar y validar todas las herramientas disponibles generando reportes de investigación locales.\n\n---\n\n## 🛠️ HERRAMIENTAS DISPONIBLES\n\n### **1. Code Tool Filesystem (Python)**\n**Operaciones disponibles:**\n- `write`: Crear nuevos reportes de investigación\n- `read`: Leer reportes existentes \n- `list`: Listar todos los archivos de investigación\n\n**Parámetros para write:**\n- `operation`: \"write\"\n- `content`: Contenido del reporte en markdown\n- `filename`: Nombre del archivo (opcional, se genera automático)\n- `query`: Consulta original del usuario\n\n**Parámetros para read:**\n- `operation`: \"read\"\n- `file_path`: Ruta completa del archivo a leer\n\n**Parámetros para list:**\n- `operation`: \"list\"\n\n### **2. Perplexity Research**\n- Usar para obtener información externa real\n- Solo cuando sea necesario para el contenido\n\n---\n\n## 📋 COMANDOS DE TESTING DISPONIBLES\n\n### **\"test write\"** → Crear archivo de prueba\n1. Generar contenido simple de investigación\n2. Usar Code Tool con operation=\"write\"\n3. Confirmar archivo creado y ruta\n\n### **\"test read\"** → Leer archivo existente  \n1. Primero usar operation=\"list\" para ver archivos\n2. Usar operation=\"read\" con un archivo específico\n3. Mostrar contenido leído\n\n### **\"test list\"** → Listar archivos\n1. Usar operation=\"list\"\n2. Mostrar estructura de directorios\n3. Confirmar archivos disponibles\n\n### **\"test full\"** → Test completo\n1. Listar archivos existentes\n2. Crear nuevo reporte con Perplexity research\n3. Leer el archivo creado\n4. Confirmar todo funcionando\n\n### **Cualquier consulta de investigación**\n1. Usar Perplexity para investigar el tema\n2. Generar reporte markdown estructurado\n3. Guardar con Code Tool (operation=\"write\")\n4. Confirmar ruta y contenido\n\n---\n\n## 📄 TEMPLATE DE REPORTE SIMPLE\n\n```markdown\n# Research Report: [TEMA]\n**Fecha:** [YYYY-MM-DD]\n**Investigador:** Research Agent Local\n**Query:** [consulta original]\n\n## Resumen Ejecutivo\n[2-3 párrafos con hallazgos principales]\n\n## Hallazgos Clave\n- Hallazgo 1\n- Hallazgo 2  \n- Hallazgo 3\n\n## Conclusiones\n[Conclusiones principales]\n\n## Fuentes\n- Fuente 1\n- Fuente 2\n```\n\n---\n\n## 🎯 PROTOCOLO DE TESTING\n\n### **PASO 1: SIEMPRE confirmar herramientas disponibles**\nAl iniciar cualquier tarea, usar Code Tool con operation=\"list\" para verificar el estado del filesystem.\n\n### **PASO 2: Para investigación real**\n1. Usar Perplexity para investigar el tema\n2. Estructurar contenido en formato markdown\n3. Usar Code Tool con operation=\"write\" para guardar\n4. Confirmar archivo creado con ruta específica\n\n### **PASO 3: Respuesta final OBLIGATORIA**\n```\n✅ **Testing completado exitosamente**\n\n🔧 **Herramientas probadas:**\n- [x] Code Tool Filesystem\n- [x] Perplexity Research (si se usó)\n\n📁 **Archivo generado:**\nRuta: [ruta_completa_del_archivo]\nTamaño: [tamaño_en_KB]\n\n📊 **Resultado:**\n[Breve descripción del contenido generado]\n\n🧪 **Para verificar:**\n`docker exec n8n-local cat [ruta_del_archivo]`\n```\n\n---\n\n## ⚠️ IMPORTANTE PARA TESTING\n\n- **SIEMPRE** usar los parámetros correctos para el Code Tool\n- **CONFIRMAR** que el archivo se creó con la ruta exacta\n- **INCLUIR** comandos docker para que el usuario pueda verificar\n- **SER ESPECÍFICO** con nombres de archivos y rutas\n- **PROBAR** todas las operaciones: write, read, list\n\n**Directorio base:** `/home/node/.n8n/research-reports/completed/`\n**Naming:** `research_[tema]_[YYYY-MM-DD].md`"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [640, 300],
+      "id": "research-agent-local",
+      "name": "Research Agent Local"
+    },
+    {
+      "parameters": {
+        "model": "sonar-pro",
+        "messages": {
+          "message": [
+            {
+              "content": "={{ $json.query || 'Research competitive analysis' }}"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.2,
+          "maxTokens": 4000
+        }
+      },
+      "type": "n8n-nodes-base.perplexityTool",
+      "typeVersion": 1,
+      "position": [480, 500],
+      "id": "perplexity-research",
+      "name": "Perplexity Research",
+      "credentials": {
+        "perplexityApi": {
+          "id": "perplexity_credentials",
+          "name": "Perplexity API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filesystem Read Tool - Lee archivos de investigación existentes\nconst fs = require('fs');\nconst path = require('path');\n\n// Obtener parámetros del agent\nconst filePath = $fromAI('file_path', '/home/node/.n8n/research-reports/', 'string');\n\ntry {\n  // Verificar si el archivo existe\n  if (!fs.existsSync(filePath)) {\n    return {\n      error: true,\n      message: `Archivo no encontrado: ${filePath}`,\n      suggestion: 'Verificar ruta o crear nuevo reporte'\n    };\n  }\n  \n  // Leer contenido del archivo\n  const content = fs.readFileSync(filePath, 'utf8');\n  \n  // Obtener metadata del archivo\n  const stats = fs.statSync(filePath);\n  \n  return {\n    success: true,\n    content: content,\n    metadata: {\n      size: stats.size,\n      modified: stats.mtime,\n      created: stats.birthtime,\n      path: filePath\n    },\n    message: `Archivo leído exitosamente: ${path.basename(filePath)}`\n  };\n  \n} catch (error) {\n  return {\n    error: true,\n    message: `Error al leer archivo: ${error.message}`,\n    errorCode: error.code\n  };\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [860, 180],
+      "id": "filesystem-read-tool",
+      "name": "Filesystem Read Tool"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filesystem Write Tool - Crea reportes de investigación en markdown\nconst fs = require('fs');\nconst path = require('path');\n\n// Obtener parámetros del agent\nconst filename = $fromAI('filename', '', 'string');\nconst content = $fromAI('content', '', 'string');\nconst overwrite = $fromAI('overwrite', false, 'boolean');\n\n// Directorio base para reportes (dentro del volumen n8n_data)\nconst baseDir = '/home/node/.n8n/research-reports/completed';\nconst tempDir = '/home/node/.n8n/research-reports/temp';\n\ntry {\n  // Crear directorios si no existen\n  if (!fs.existsSync('/home/node/.n8n/research-reports')) {\n    fs.mkdirSync('/home/node/.n8n/research-reports', { recursive: true });\n  }\n  if (!fs.existsSync(baseDir)) {\n    fs.mkdirSync(baseDir, { recursive: true });\n  }\n  if (!fs.existsSync(tempDir)) {\n    fs.mkdirSync(tempDir, { recursive: true });\n  }\n  \n  // Generar nombre de archivo si no se proporciona\n  let finalFilename = filename;\n  if (!finalFilename) {\n    const timestamp = new Date().toISOString().split('T')[0];\n    finalFilename = `research_report_${timestamp}.md`;\n  }\n  \n  // Asegurar extensión .md\n  if (!finalFilename.endsWith('.md')) {\n    finalFilename += '.md';\n  }\n  \n  const fullPath = path.join(baseDir, finalFilename);\n  \n  // Verificar si el archivo existe y manejo de conflictos\n  if (fs.existsSync(fullPath) && !overwrite) {\n    // Crear versión numerada\n    const baseName = path.basename(finalFilename, '.md');\n    let counter = 1;\n    let newPath;\n    \n    do {\n      const versionedName = `${baseName}_v${counter}.md`;\n      newPath = path.join(baseDir, versionedName);\n      counter++;\n    } while (fs.existsSync(newPath));\n    \n    finalFilename = path.basename(newPath);\n    fullPath = newPath;\n  }\n  \n  // Agregar header estándar si no existe\n  let finalContent = content;\n  if (!content.includes('# Research Report:')) {\n    const timestamp = new Date().toISOString();\n    const header = `# Research Report\\n**Fecha:** ${timestamp.split('T')[0]}\\n**Investigador:** Research Agent Local\\n**Ubicación:** ${fullPath}\\n\\n`;\n    finalContent = header + content;\n  }\n  \n  // Escribir archivo\n  fs.writeFileSync(fullPath, finalContent, 'utf8');\n  \n  // Obtener stats del archivo creado\n  const stats = fs.statSync(fullPath);\n  \n  return {\n    success: true,\n    filePath: fullPath,\n    filename: finalFilename,\n    size: stats.size,\n    created: stats.birthtime,\n    message: `Reporte creado exitosamente: ${finalFilename}`,\n    directory: baseDir,\n    accessPath: `docker exec n8n-local cat ${fullPath}`\n  };\n  \n} catch (error) {\n  // Fallback a directorio temporal dentro del volumen\n  const fallbackDir = '/home/node/.n8n/research-reports/temp';\n  \n  try {\n    if (!fs.existsSync(fallbackDir)) {\n      fs.mkdirSync(fallbackDir, { recursive: true });\n    }\n    \n    const tempPath = path.join(fallbackDir, finalFilename || 'research_report_temp.md');\n    fs.writeFileSync(tempPath, content, 'utf8');\n    \n    return {\n      success: true,\n      filePath: tempPath,\n      filename: path.basename(tempPath),\n      message: `Reporte creado en directorio temporal: ${tempPath}`,\n      warning: `Error en directorio principal: ${error.message}`,\n      directory: fallbackDir\n    };\n    \n  } catch (tempError) {\n    return {\n      error: true,\n      message: `Error al crear archivo: ${error.message}`,\n      tempError: tempError.message,\n      suggestion: 'Verificar permisos de filesystem y configuración de directorios'\n    };\n  }\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [860, 340],
+      "id": "filesystem-write-tool",
+      "name": "Filesystem Write Tool"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filesystem List Tool - Lista archivos de investigación disponibles\nconst fs = require('fs');\nconst path = require('path');\n\n// Obtener parámetros del agent\nconst directory = $fromAI('directory', '/home/node/.n8n/research-reports/', 'string');\nconst filter = $fromAI('filter', '', 'string');\n\ntry {\n  // Verificar si el directorio existe\n  if (!fs.existsSync(directory)) {\n    return {\n      success: true,\n      files: [],\n      message: `Directorio no existe: ${directory}`,\n      suggestion: 'Crear primer reporte para inicializar directorio'\n    };\n  }\n  \n  // Leer archivos del directorio de manera recursiva\n  const getAllFiles = (dir, fileList = []) => {\n    const files = fs.readdirSync(dir);\n    \n    files.forEach(file => {\n      const filePath = path.join(dir, file);\n      const stat = fs.statSync(filePath);\n      \n      if (stat.isDirectory()) {\n        getAllFiles(filePath, fileList);\n      } else if (file.endsWith('.md')) {\n        fileList.push(filePath);\n      }\n    });\n    \n    return fileList;\n  };\n  \n  const allMarkdownFiles = getAllFiles(directory);\n  \n  // Aplicar filtro si se proporciona\n  let filteredFiles = allMarkdownFiles;\n  if (filter) {\n    const filterLower = filter.toLowerCase();\n    filteredFiles = allMarkdownFiles.filter(file => \n      path.basename(file).toLowerCase().includes(filterLower)\n    );\n  }\n  \n  // Obtener metadata de cada archivo\n  const fileDetails = filteredFiles.map(filePath => {\n    const stats = fs.statSync(filePath);\n    const relativePath = path.relative('/home/node/.n8n/research-reports/', filePath);\n    \n    return {\n      filename: path.basename(filePath),\n      relativePath: relativePath,\n      fullPath: filePath,\n      size: stats.size,\n      sizeFormatted: `${(stats.size / 1024).toFixed(2)} KB`,\n      modified: stats.mtime,\n      created: stats.birthtime,\n      modifiedFormatted: stats.mtime.toISOString().split('T')[0],\n      subdirectory: path.dirname(relativePath)\n    };\n  });\n  \n  // Ordenar por fecha de modificación (más reciente primero)\n  fileDetails.sort((a, b) => new Date(b.modified) - new Date(a.modified));\n  \n  return {\n    success: true,\n    directory: directory,\n    totalFiles: allMarkdownFiles.length,\n    filteredFiles: filteredFiles.length,\n    filter: filter || 'ninguno',\n    files: fileDetails,\n    message: `Encontrados ${filteredFiles.length} archivos de investigación`,\n    structure: {\n      completed: fileDetails.filter(f => f.subdirectory.includes('completed')).length,\n      temp: fileDetails.filter(f => f.subdirectory.includes('temp')).length,\n      root: fileDetails.filter(f => f.subdirectory === '.').length\n    }\n  };\n  \n} catch (error) {\n  return {\n    error: true,\n    message: `Error al listar archivos: ${error.message}`,\n    directory: directory,\n    errorCode: error.code\n  };\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [860, 500],
+      "id": "filesystem-list-tool",
+      "name": "Filesystem List Tool"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filesystem Append Tool - Actualiza reportes existentes\nconst fs = require('fs');\nconst path = require('path');\n\n// Obtener parámetros del agent\nconst filePath = $fromAI('file_path', '', 'string');\nconst content = $fromAI('content', '', 'string');\nconst section = $fromAI('section', '', 'string');\n\ntry {\n  // Verificar si el archivo existe\n  if (!fs.existsSync(filePath)) {\n    return {\n      error: true,\n      message: `Archivo no encontrado: ${filePath}`,\n      suggestion: 'Crear nuevo reporte con Filesystem Write Tool'\n    };\n  }\n  \n  // Leer contenido actual\n  const currentContent = fs.readFileSync(filePath, 'utf8');\n  \n  // Preparar contenido a añadir\n  const timestamp = new Date().toISOString();\n  let newContent;\n  \n  if (section) {\n    // Añadir a sección específica\n    newContent = `\\n\\n## UPDATE - ${section}\\n**Actualizado:** ${timestamp.split('T')[0]}\\n\\n${content}\\n`;\n  } else {\n    // Añadir al final\n    newContent = `\\n\\n---\\n**Actualización:** ${timestamp.split('T')[0]}\\n\\n${content}\\n`;\n  }\n  \n  // Combinar contenido\n  const updatedContent = currentContent + newContent;\n  \n  // Crear backup del archivo original\n  const backupDir = '/home/node/.n8n/research-reports/backups';\n  if (!fs.existsSync(backupDir)) {\n    fs.mkdirSync(backupDir, { recursive: true });\n  }\n  \n  const backupPath = path.join(backupDir, `${path.basename(filePath)}.backup.${Date.now()}`);\n  fs.copyFileSync(filePath, backupPath);\n  \n  // Escribir contenido actualizado\n  fs.writeFileSync(filePath, updatedContent, 'utf8');\n  \n  // Obtener stats del archivo actualizado\n  const stats = fs.statSync(filePath);\n  \n  return {\n    success: true,\n    filePath: filePath,\n    backupPath: backupPath,\n    newSize: stats.size,\n    modified: stats.mtime,\n    section: section || 'final del documento',\n    message: `Archivo actualizado exitosamente: ${path.basename(filePath)}`,\n    addedContent: content.length + ' caracteres añadidos'\n  };\n  \n} catch (error) {\n  return {\n    error: true,\n    message: `Error al actualizar archivo: ${error.message}`,\n    filePath: filePath,\n    errorCode: error.code\n  };\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [860, 660],
+      "id": "filesystem-append-tool",
+      "name": "Filesystem Append Tool"
+    },
+    {
+      "parameters": {
+        "content": "## 🔄 FLUJO DE PROCESAMIENTO\n\n### Entrada de Consulta:\n- Desde Manager Workflow\n- Test manual directo\n\n### Procesamiento:\n1. **Ollama DeepSeek** analiza consulta\n2. **Perplexity** realiza investigación externa\n3. **Research Agent** procesa y estructura\n4. **Filesystem Tools** manejan archivos\n\n### Salida:\n- Ruta de archivo local\n- Resumen de hallazgos\n- Metadata de proceso\n\n### Ubicación final:\n`/home/node/.n8n/research-reports/completed/`",
+        "height": 320,
+        "width": 300,
+        "color": 7
+      },
+      "id": "nota-processing-flow",
+      "name": "Nota Flujo de Proceso",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1100, 50]
+    },
+    {
+      "parameters": {
+        "content": "## 🛠️ FILESYSTEM TOOLS\n\n### Read Tool:\n- Lee reportes existentes\n- Proporciona contexto\n- Metadata de archivos\n\n### Write Tool:\n- Crea nuevos reportes\n- Naming automático\n- Manejo de conflictos\n- Directorios: `/completed/`, `/temp/`\n\n### List Tool:\n- Lista archivos disponibles\n- Filtros por empresa/fecha\n- Metadata completa\n- Búsqueda recursiva\n\n### Append Tool:\n- Actualiza reportes\n- Backups automáticos en `/backups/`\n- Control de versiones",
+        "height": 360,
+        "width": 280,
+        "color": 4
+      },
+      "id": "nota-filesystem-tools",
+      "name": "Nota Filesystem Tools",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1200, 350]
+    },
+    {
+      "parameters": {
+        "content": "## ⚠️ TROUBLESHOOTING\n\n### Errores Comunes:\n\n**Ollama no disponible:**\n- Verificar: `ollama serve`\n- Modelo: `ollama pull deepseek-coder:1.3b`\n- Network: `http://host.docker.internal:11434`\n\n**Permisos filesystem:**\n- Automático en volumen n8n_data\n- Usuario node (UID 1000)\n\n**Perplexity API:**\n- Verificar credenciales en n8n\n- Límites de rate\n- Conectividad internet\n\n**Verificar archivos creados:**\n```bash\ndocker exec n8n-local ls -la /home/node/.n8n/research-reports/\ndocker exec n8n-local cat /home/node/.n8n/research-reports/completed/research_*.md\n```",
+        "height": 380,
+        "width": 340,
+        "color": 5
+      },
+      "id": "nota-troubleshooting",
+      "name": "Nota Troubleshooting",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1520, 200]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Ollama DeepSeek Coder": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Research Agent Local",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ejecutar desde Manager": {
+      "main": [
+        [
+          {
+            "node": "Research Agent Local",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Test Manual": {
+      "main": [
+        [
+          {
+            "node": "Research Agent Local",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Perplexity Research": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Agent Local",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filesystem Read Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Agent Local",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filesystem Write Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Agent Local",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filesystem List Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Agent Local",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filesystem Append Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Agent Local",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "research-agent-local-v1.0",
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": "12345678-abcd-1234-5678-123456789abc"
+  },
+  "id": "ResearchAgentLocal2024"
+}
